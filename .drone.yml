@@ -1,0 +1,16 @@
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: lint-charts
+  pull: default
+  image: ranchercharts/chart-testing:v2.0.2-rancher3
+  commands:
+  - git remote add rancher-helm3-charts https://github.com/rancher/helm3-charts
+  - git fetch rancher-helm3-charts master
+  - ct lint --config test/ct.yaml
