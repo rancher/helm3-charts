@@ -1,4 +1,4 @@
-remote: rancher-charts
+remote: rancher-helm3-charts
 target-branch: master
 chart-dirs:
   - charts
