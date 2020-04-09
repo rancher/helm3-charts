@@ -2,6 +2,8 @@ categories:
 - APM
 - Monitoring
 rancher_min_version: v2.4.0
+labels:
+  io.rancher.certified: partner
 questions:
 
 #################### Agent Configuration (REQUIRED) ####################
