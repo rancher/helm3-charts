@@ -1,0 +1,10 @@
+labels:
+  io.cattle.role: project # options are cluster/project
+categories:
+- API Gateway
+questions:
+- variable: ingressController.installCRDs
+  default: "false"
+  description: "Install CRDs"
+  label: ingressController.installCRDs
+  type: boolean
