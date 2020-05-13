@@ -1,5 +1,6 @@
 # Upgrade considerations
 
+
 New versions of the Kong chart may add significant new functionality or
 deprecate/entirely remove old functionality. This document covers how and why
 users should update their chart configuration to take advantage of new features
