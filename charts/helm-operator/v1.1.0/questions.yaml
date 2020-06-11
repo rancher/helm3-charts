@@ -1,0 +1,42 @@
+questions:
+# Global
+- variable: chartsSyncInterval
+  label: Chart Sync Interval
+  description: "Period on which to reconcile the Helm releases with HelmRelease resources"
+  type: string
+  default: "3m"
+  group: Global
+- variable: statusUpdateInterval
+  label: Status Update Interval
+  description: "Period on which to update the Helm release status in HelmRelease resources"
+  type: string
+  default: 30s
+  group: Global
+
+# Git
+- variable: git.ssh.secretName
+  label: SSH Secret Name
+  description: ""
+  type: string
+  default: "flux-git-deploy"
+  group: Git
+- variable: git.pollInterval
+  label: Poll Interval
+  description: "Period on which to poll git chart sources for changes"
+  type: string
+  default: "5m"
+  group: Git
+- variable: git.timeout
+  label: Timeout
+  description: "Duration after which git operations time out"
+  type: string
+  default: "20s"
+  group: Git
+
+# Prometheus
+- variable: prometheus.enabled
+  label: Enable Prometheus
+  description: "If enabled, adds prometheus annotations to Helm Operator pod(s)"
+  type: boolean
+  default: false
+  group: Prometheus

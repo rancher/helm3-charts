@@ -32,7 +32,7 @@ workers: 4
 
 # Helm versions supported by this operator instance
 helm:
-  versions: "v2,v3"
+  versions: "v3"
 
 # Tiller settings
 # If a hostname or IP is given here, that will be combined with the
