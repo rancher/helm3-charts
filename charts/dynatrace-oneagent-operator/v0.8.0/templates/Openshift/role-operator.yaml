@@ -14,7 +14,7 @@
 
 {{- $platformIsSet := printf "%s" (required "Platform needs to be set to kubernetes or openshift" (include "dynatrace-oneagent-operator.platformSet" .))}}
 {{- if eq .Values.platform "openshift" }}
-apiVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: Role
 metadata:
   name: {{ .Release.Name }}
@@ -26,7 +26,6 @@ rules:
       - dynatrace.com
     resources:
       - oneagents
-      - oneagentapms
     verbs:
       - get
       - list
@@ -43,21 +42,6 @@ rules:
       - create
       - update
       - delete
-  - apiGroups:
-      - apps
-    resources:
-      - replicasets
-      - deployments
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - apps
-    resources:
-      - deployments/finalizers
-    verbs:
-      - update
   - apiGroups:
       - "" # "" indicates the core API group
     resources:
@@ -79,6 +63,21 @@ rules:
       - watch
       - delete
   - apiGroups:
+      - apps
+    resources:
+      - replicasets
+      - deployments
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments/finalizers
+    verbs:
+      - update
+  - apiGroups:
       - "" # "" indicates the core API group
     resources:
       - secrets
@@ -98,8 +97,6 @@ rules:
     resources:
       - oneagents/finalizers
       - oneagents/status
-      - oneagentapms/finalizers
-      - oneagentapms/status
     verbs:
       - update
   - apiGroups:

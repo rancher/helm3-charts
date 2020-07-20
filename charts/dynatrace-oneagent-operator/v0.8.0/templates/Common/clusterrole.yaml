@@ -13,41 +13,18 @@
 # limitations under the License.
 
 {{- $platformIsSet := printf "%s" (required "Platform needs to be set to kubernetes or openshift" (include "dynatrace-oneagent-operator.platformSet" .))}}
-{{- if eq .Values.platform "openshift" }}
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
 metadata:
-  name: dynatrace-oneagent-webhook
-  namespace: {{ .Release.Namespace }}
+  name: {{ .Release.Name }}
   labels:
-    {{- include "dynatrace-oneagent-operator.commonlabelswebhook" . | nindent 4 }}
+    {{- include "dynatrace-oneagent-operator.commonlabels" . | nindent 4 }}
 rules:
   - apiGroups:
-      - ""
+      - "" # "" indicates the core API group
     resources:
-      - services
-      - configmaps
-      - secrets
+      - nodes
     verbs:
       - get
       - list
       - watch
-      - create
-      - update
-  - apiGroups:
-      - ""
-    resources:
-      - pods
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups:
-      - dynatrace.com
-    resources:
-      - oneagentapms
-    verbs:
-      - get
-      - list
-      - watch
-{{ end }}
