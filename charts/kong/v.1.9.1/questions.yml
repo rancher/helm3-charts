@@ -17,7 +17,7 @@ questions:
     description: "Service Type"
     label: Service Type
     type: options
-      - "ClusterIP"
+      - "ClusterIPa"
       - "NodePort"
       - "LoadBalancer"
   - variable: admin.http.enabled
