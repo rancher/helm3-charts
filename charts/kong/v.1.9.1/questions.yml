@@ -14,12 +14,13 @@ questions:
   subquestions:
   - variable: admin.type
     default: "LoadBalancer"
-    description: "Service Type"
+    description: "Kubernetes Service Type"
     label: Service Type
-    type: options
-      - "ClusterIPa"
-      - "NodePort"
-      - "LoadBalancer"
+    type: enum
+    options:
+      - ClusterIP
+      - NodePort
+      - LoadBalancer
   - variable: admin.http.enabled
     default: "false"
     description: "Enable HTTP for REST Admin API"
