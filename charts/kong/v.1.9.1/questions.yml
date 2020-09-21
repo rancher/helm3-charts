@@ -17,9 +17,9 @@ questions:
     description: "Service Type"
     label: Service Type
     type: options
-      - “ClusterIP”
-      - “NodePort”
-      - “LoadBalancer”
+      - "ClusterIP"
+      - "NodePort"
+      - "LoadBalancer"
   - variable: admin.http.enabled
     default: "false"
     description: "Enable HTTP for REST Admin API"
