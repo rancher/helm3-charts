@@ -3,6 +3,9 @@
 # - disable ingress controller
 ingressController:
   enabled: false
+  installCRDs: false
+  env:
+    anonymous_reports: "false"
 # - use legacy admin listen config
 admin:
   enabled: true
@@ -12,6 +15,7 @@ admin:
 
 # - disable DB for kong
 env:
+  anonymous_reports: "off"
   database: "off"
 postgresql:
   enabled: false

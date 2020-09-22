@@ -1,5 +1,141 @@
 # Changelog
 
+## 1.9.1
+
+### Documentation
+
+* Clarified documentation for [breaking changes in 1.9.0](#190) to indicate
+  that any values.yaml that sets `waitImage.repository` requires changes,
+  including those that set the old default.
+* Updated Enterprise examples to use latest Enterprise image version.
+
+## 1.9.0
+
+### Breaking changes
+
+1.9.0 now uses a bash-based pre-migration database availability check. If you
+set `waitImage.repository` in values.yaml, either to the previous default
+(`busybox`) or to a custom image, you must change it to an image that includes
+a `bash` executable.
+
+Once you have `waitImage.repository` set to an image with bash, [perform an
+initial chart version upgrade with migrations disabled](https://github.com/Kong/charts/blob/main/charts/kong/UPGRADE.md#changes-to-wait-for-postgres-image)
+before re-enabling migrations, updating your Kong image version, and performing
+a second release upgrade.
+
+### Improvements
+
+* Added support for sidecar injection.
+  ([#174](https://github.com/Kong/charts/pull/174))
+* Changed to a bash-based pre-migration database availability check.
+  ([#179](https://github.com/Kong/charts/pull/179))
+* Changed to a bash-based pre-migration database availability check.
+  ([#179](https://github.com/Kong/charts/pull/179))
+* Updated default Kong Enterprise version to 2.1.3.0.
+
+### Fixed
+
+* Added missing cluster telemetry service and fixed missing cluster service
+  port.
+  ([#185](https://github.com/Kong/charts/pull/185))
+
+### Documentation
+
+* Added an example Enterprise controller-managed DB-less values.yaml.
+  ([#175](https://github.com/Kong/charts/pull/175))
+
+## 1.8.0
+
+**Kong Enterprise users:** please review documentation for the [Kong Enterprise
+2.1.x beta
+release](https://docs.konghq.com/enterprise/2.1.x/release-notes/#coming-soon)
+and [hybrid mode on Kong
+Enterprise](https://docs.konghq.com/enterprise/2.1.x/deployment/hybrid-mode/#kubernetes-support)
+as well. Version 1.8 of the Kong Helm chart adds support for hybrid mode, which
+is currently only available in the 2.1.x beta. Production systems should
+continue to use the Kong Enterprise 1.5.x stable releases, which do not support
+hybrid mode.
+
+### Improvements
+
+* Update default Kong version to 2.1.
+* Update Kong Enterprise images to 1.5.0.4 (kong-enterprise-edition) and
+  2.0.4.2 (kong-enterprise-k8s).
+* Updated default controller version to 0.9.1.
+  ([#150](https://github.com/Kong/charts/pull/150))
+* Added support for ServiceMonitor targetLabels (for use with the Prometheus
+  Operator).
+  ([#162](https://github.com/Kong/charts/pull/162))
+* Automatically handle the [new port_maps
+  setting](https://github.com/Kong/kong/pull/5861) for the proxy service.
+  ([#169](https://github.com/Kong/charts/pull/169))
+* Add support for [hybrid mode
+  deployments](https://docs.konghq.com/latest/hybrid-mode/).
+  ([#160](https://github.com/Kong/charts/pull/160))
+
+
+### Fixed
+
+* Fixed an issue with improperly-rendered listen strings.
+  ([#155](https://github.com/Kong/charts/pull/155))
+
+### Documentation
+
+* Improved inline documentation of `env` in values.yaml.
+  ([#163](https://github.com/Kong/charts/pull/163))
+
+## 1.7.0
+
+### Improvements
+
+* Added support for
+  [CRD-only](https://github.com/Kong/charts/blob/1.7.0/charts/kong/README.md#crds-only)
+  and [controller-only releases](https://github.com/Kong/charts/blob/next/charts/kong/README.md#standalone-controller-nodes).
+  ([#136](https://github.com/Kong/charts/pull/136))
+
+### Documentation
+
+* Added a set of [example
+  values.yamls](https://github.com/Kong/charts/tree/main/charts/kong/example-values)
+  for various configurations of Kong and Kong Enterprise.
+  ([#134](https://github.com/Kong/charts/pull/134))
+
+## 1.6.1
+
+This release contains no changes other than the version. This is to address an
+issue with our release automation.
+
+## 1.6.0
+
+### Improvements
+
+* Updated default controller version to 0.9.0.
+  ([#132](https://github.com/Kong/charts/pull/132))
+* Updated default Enterprise versions to 2.0.4.1 and 1.5.0.2.
+  ([#130](https://github.com/Kong/charts/pull/130))
+* Added ability to override chart lifecycle.
+  ([#116](https://github.com/Kong/charts/pull/116))
+* Added ability to apply user-defined labels to pods.
+  ([#121](https://github.com/Kong/charts/pull/121))
+* Filtered serviceMonitor to disable metrics collection from non-proxy
+  services. 
+  ([#112](https://github.com/Kong/charts/pull/112))
+* Set admin API to listen on localhost only if possible.
+  ([#125](https://github.com/Kong/charts/pull/125))
+* Add `auth_type` and `ssl` settings to `smtp` block. 
+  ([#127](https://github.com/Kong/charts/pull/127))
+* Remove UID from default securityContext.
+  ([#138](https://github.com/Kong/charts/pull/138))
+
+### Documentation
+
+* Corrected invalid default serviceMonitor.interval value.
+  ([#110](https://github.com/Kong/charts/pull/110))
+* Removed duplicate `installCRDs` documentation.
+  ([#115](https://github.com/Kong/charts/pull/115))
+* Simplified example license Secret creation command.
+  ([#131](https://github.com/Kong/charts/pull/131))
+
 ## 1.5.0
 
 ### Improvements
@@ -65,7 +201,7 @@
   KongClusterPlugin and TCPIngress CRDs and RBAC permissions for them. Users
   should also note that `strip_path` now defaults to disabled, which will
   likely break existing configuration. See [the controller
-  changelog](https://github.com/Kong/kubernetes-ingress-controller/blob/master/CHANGELOG.md#080---20200325)
+  changelog](https://github.com/Kong/kubernetes-ingress-controller/blob/main/CHANGELOG.md#080---20200325)
   and [upgrade-guide](https://github.com/Kong/charts/blob/next/charts/kong/UPGRADE.md#strip_path-now-defaults-to-false-for-controller-managed-routes)
   for full details.
   ([#77](https://github.com/Kong/charts/pull/77))
@@ -129,7 +265,7 @@
   modern versions. **The `enterprise.portal.portal_auth` and
   `enterprise.portal.session_conf_secret` settings in values.yaml are
   deprecated and will be removed in a future release.** See the [upgrade
-  guide](https://github.com/Kong/charts/blob/master/charts/kong/UPGRADE.md#removal-of-dedicated-portal-authentication-configuration-parameters)
+  guide](https://github.com/Kong/charts/blob/main/charts/kong/UPGRADE.md#removal-of-dedicated-portal-authentication-configuration-parameters)
   for instructions on migrating them to environment variables.
   ([#55](https://github.com/Kong/charts/pull/55))
 
