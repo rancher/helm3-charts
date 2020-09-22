@@ -1,4 +1,3 @@
-{{- if .Values.deployment.kong.enabled }}
 {{- if (and (not .Values.ingressController.enabled) (eq .Values.env.database "off")) }}
 {{- if not .Values.dblessConfig.configMap }}
 apiVersion: v1
@@ -10,6 +9,5 @@ metadata:
 data:
   kong.yml: |
 {{ .Values.dblessConfig.config | toYaml | indent 4 }}
-{{- end }}
 {{- end }}
 {{- end }}

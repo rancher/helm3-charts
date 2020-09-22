@@ -1,4 +1,3 @@
-{{- if .Values.deployment.kong.enabled }}
 {{- if .Release.IsInstall -}}
 {{/* .migrations.init isn't normally exposed in values.yaml. In testing,
 however, adding it with value "false" didn't actually disable this job. Not
@@ -39,11 +38,7 @@ spec:
       {{- end }}
       containers:
       - name: {{ template "kong.name" . }}-migrations
-        {{- if .Values.image.unifiedRepoTag }}
-        image: "{{ .Values.image.unifiedRepoTag }}"
-        {{- else }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        {{- end }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         {{- include "kong.no_daemon_env" . | nindent 8 }}
@@ -55,6 +50,5 @@ spec:
       restartPolicy: OnFailure
       volumes:
       {{- include "kong.volumes" . | nindent 6 -}}
-{{- end }}
 {{- end }}
 {{- end }}

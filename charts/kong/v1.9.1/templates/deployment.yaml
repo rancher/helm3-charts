@@ -1,4 +1,3 @@
-{{- if or .Values.deployment.kong.enabled .Values.ingressController.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -37,9 +36,6 @@ spec:
       labels:
         {{- include "kong.metaLabels" . | nindent 8 }}
         app.kubernetes.io/component: app
-        {{- if .Values.podLabels }}
-        {{ toYaml .Values.podLabels | nindent 8 }}
-        {{- end }}
     spec:
       {{- if .Values.priorityClassName }}
       priorityClassName: "{{ .Values.priorityClassName }}"
@@ -54,33 +50,25 @@ spec:
       {{- end }}
       {{- end }}
       {{- if not (eq .Values.env.database "off") }}
-      {{- if .Values.deployment.kong.enabled }}
       initContainers:
       {{- include "kong.wait-for-db" . | nindent 6 }}
-      {{ end }}
       {{ end }}
       containers:
       {{- if .Values.ingressController.enabled }}
       {{- include "kong.controller-container" . | nindent 6 }}
       {{ end }}
-      {{- if .Values.deployment.sidecarContainers }}
-      {{- toYaml .Values.deployment.sidecarContainers | nindent 6 }}
-      {{- end }}
-      {{- if .Values.deployment.kong.enabled }}
       - name: "proxy"
-        {{- if .Values.image.unifiedRepoTag }}
-        image: "{{ .Values.image.unifiedRepoTag }}"
-        {{- else }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        {{- end }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         {{- include "kong.no_daemon_env" . | nindent 8 }}
         lifecycle:
-          {{- toYaml .Values.lifecycle | nindent 10 }}
+          preStop:
+            exec:
+              command: [ "/bin/sh", "-c", "kong quit" ]
         ports:
         {{/* TODO: remove legacy admin port template */}}
-        {{- if (and .Values.admin.containerPort .Values.admin.enabled) }}
+        {{- if .Values.admin.containerPort }}
         - name: admin
           containerPort: {{ .Values.admin.containerPort }}
           {{- if .Values.admin.hostPort }}
@@ -88,7 +76,7 @@ spec:
           {{- end}}
           protocol: TCP
         {{- end }}
-        {{- if (and .Values.admin.http.enabled .Values.admin.enabled) }}
+        {{- if .Values.admin.http.enabled }}
         - name: admin
           containerPort: {{ .Values.admin.http.containerPort }}
           {{- if .Values.admin.http.hostPort }}
@@ -96,7 +84,7 @@ spec:
           {{- end}}
           protocol: TCP
         {{- end }}
-        {{- if (and .Values.admin.tls.enabled .Values.admin.enabled) }}
+        {{- if .Values.admin.tls.enabled }}
         - name: admin-tls
           containerPort: {{ .Values.admin.tls.containerPort }}
           {{- if .Values.admin.tls.hostPort }}
@@ -104,7 +92,7 @@ spec:
           {{- end}}
           protocol: TCP
         {{- end }}
-        {{- if (and .Values.proxy.http.enabled .Values.proxy.enabled) }}
+        {{- if .Values.proxy.http.enabled }}
         - name: proxy
           containerPort: {{ .Values.proxy.http.containerPort }}
           {{- if .Values.proxy.http.hostPort }}
@@ -112,7 +100,7 @@ spec:
           {{- end}}
           protocol: TCP
         {{- end }}
-        {{- if (and .Values.proxy.tls.enabled .Values.proxy.enabled)}}
+        {{- if .Values.proxy.tls.enabled }}
         - name: proxy-tls
           containerPort: {{ .Values.proxy.tls.containerPort }}
           {{- if .Values.proxy.tls.hostPort }}
@@ -128,7 +116,7 @@ spec:
           {{- end}}
           protocol: TCP
         {{- end }}
-        {{- if (and .Values.status.http.enabled .Values.status.enabled)}}
+        {{- if .Values.status.http.enabled }}
         - name: status
           containerPort: {{ .Values.status.http.containerPort }}
           {{- if .Values.status.http.hostPort }}
@@ -136,19 +124,11 @@ spec:
           {{- end}}
           protocol: TCP
         {{- end }}
-        {{- if (and .Values.status.tls.enabled .Values.status.enabled) }}
+        {{- if .Values.status.tls.enabled }}
         - name: status-tls
           containerPort: {{ .Values.status.tls.containerPort }}
           {{- if .Values.status.tls.hostPort }}
           hostPort: {{ .Values.status.tls.hostPort }}
-          {{- end}}
-          protocol: TCP
-        {{- end }}
-        {{- if (and .Values.cluster.tls.enabled .Values.cluster.enabled) }}
-        - name: cluster-tls
-          containerPort: {{ .Values.cluster.tls.containerPort }}
-          {{- if .Values.cluster.tls.hostPort }}
-          hostPort: {{ .Values.cluster.tls.hostPort }}
           {{- end}}
           protocol: TCP
         {{- end }}
@@ -161,7 +141,7 @@ spec:
           protocol: TCP
         {{- end }}
         {{- if .Values.enterprise.enabled }}
-        {{- if (and .Values.manager.http.enabled .Values.manager.enabled) }}
+        {{- if .Values.manager.http.enabled }}
         - name: manager
           containerPort: {{ .Values.manager.http.containerPort }}
           {{- if .Values.manager.http.hostPort }}
@@ -169,7 +149,7 @@ spec:
           {{- end}}
           protocol: TCP
         {{- end }}
-        {{- if (and .Values.manager.tls.enabled .Values.manager.enabled) }}
+        {{- if .Values.manager.tls.enabled }}
         - name: manager-tls
           containerPort: {{ .Values.manager.tls.containerPort }}
           {{- if .Values.manager.tls.hostPort }}
@@ -177,7 +157,7 @@ spec:
           {{- end}}
           protocol: TCP
         {{- end }}
-        {{- if (and .Values.portal.http.enabled .Values.portal.enabled) }}
+        {{- if .Values.portal.http.enabled }}
         - name: portal
           containerPort: {{ .Values.portal.http.containerPort }}
           {{- if .Values.portal.http.hostPort }}
@@ -185,7 +165,7 @@ spec:
           {{- end}}
           protocol: TCP
         {{- end }}
-        {{- if (and .Values.portal.tls.enabled .Values.portal.enabled) }}
+        {{- if .Values.portal.tls.enabled }}
         - name: portal-tls
           containerPort: {{ .Values.portal.tls.containerPort }}
           {{- if .Values.portal.tls.hostPort }}
@@ -193,7 +173,7 @@ spec:
           {{- end}}
           protocol: TCP
         {{- end }}
-        {{- if (and .Values.portalapi.http.enabled .Values.portalapi.enabled) }}
+        {{- if .Values.portalapi.http.enabled }}
         - name: portalapi
           containerPort: {{ .Values.portalapi.http.containerPort }}
           {{- if .Values.portalapi.http.hostPort }}
@@ -201,22 +181,13 @@ spec:
           {{- end}}
           protocol: TCP
         {{- end }}
-        {{- if (and .Values.portalapi.tls.enabled .Values.portalapi.enabled) }}
+        {{- if .Values.portalapi.tls.enabled }}
         - name: portalapi-tls
           containerPort: {{ .Values.portalapi.tls.containerPort }}
           {{- if .Values.portalapi.tls.hostPort }}
           hostPort: {{ .Values.portalapi.tls.hostPort }}
           {{- end}}
           protocol: TCP
-        {{- end }}
-        {{- if (and .Values.clustertelemetry.tls.enabled .Values.clustertelemetry.enabled) }}
-        - name: clustert-tls
-          containerPort: {{ .Values.clustertelemetry.tls.containerPort }}
-          {{- if .Values.clustertelemetry.tls.hostPort }}
-          hostPort: {{ .Values.clustertelemetry.tls.hostPort }}
-          {{- end}}
-          protocol: TCP
-        {{- end }}
         {{- end }}
         {{- end }}
         volumeMounts:
@@ -241,4 +212,3 @@ spec:
 {{ toYaml .Values.tolerations | indent 8 }}
       volumes:
       {{- include "kong.volumes" . | nindent 8 -}}
-{{- end }}

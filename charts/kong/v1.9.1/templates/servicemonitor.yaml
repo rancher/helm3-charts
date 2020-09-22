@@ -24,9 +24,5 @@ spec:
     - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      enable-metrics: "true"
       {{- include "kong.metaLabels" . | nindent 6 }}
-  {{- if .Values.serviceMonitor.targetLabels }}
-  targetLabels: {{ toYaml .Values.serviceMonitor.targetLabels | nindent 4 }}
-  {{- end }}
 {{- end }}
