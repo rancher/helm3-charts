@@ -3,13 +3,13 @@ categories:
 - Monitoring
 questions:
 
-#################### Agent Configuration (REQUIRED) ####################
+#################### Agent Configuration ####################
 - variable: mode
   label: "Monitoring mode"
   description: "Either fullstack for full monitoring or apm for application only monitoring"
   default: "fullstack"
   type: enum
-  group: "Agent Configuration (REQUIRED)"
+  group: "Agent Configuration"
   options:
     - "fullstack"
     - "apm"
@@ -20,15 +20,14 @@ questions:
   default: "https://ENVIRONMENTID.live.dynatrace.com/api"
   type: string
   required: true
-  group: "Agent Configuration (REQUIRED)"
+  group: "Agent Configuration"
 
 - variable: secret.apiToken
   label: "Dynatrace API token"
   description: "Your Dynatrace API token - You can generate this token in your Dynatrace environment"
   default: ""
   type: string
-  required: false
-  group: "Agent Configuration (REQUIRED)"
+  group: "Agent Configuration"
 
 - variable: secret.paasToken
   label: "Dynatrace PaaS token"
@@ -36,7 +35,7 @@ questions:
   default: ""
   type: string
   required: true
-  group: "Agent Configuration (REQUIRED)"
+  group: "Agent Configuration"
 
 #################### Advanced Agent Configuration (OPTIONAL) ####################
 - variable: show_advanced_config
