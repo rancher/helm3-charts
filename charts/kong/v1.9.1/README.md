@@ -34,6 +34,10 @@ $ helm install kong/kong --generate-name --set ingressController.installCRDs=fal
   - [Runtime package](#runtime-package)
   - [Configuration method](#configuration-method)
   - [Separate admin and proxy nodes](#separate-admin-and-proxy-nodes)
+  - [Standalone controller nodes](#standalone-controller-nodes)
+  - [Hybrid mode](#hybrid-mode)
+  - [CRDs only](#crds-only)
+  - [Example configurations](#example-configurations)
 - [Configuration](#configuration)
   - [Kong Parameters](#kong-parameters)
     - [Kong Service Parameters](#kong-service-parameters)
@@ -48,8 +52,8 @@ $ helm install kong/kong --generate-name --set ingressController.installCRDs=fal
   - [RBAC](#rbac)
   - [Sessions](#sessions)
   - [Email/SMTP](#emailsmtp)
-- [Changelog](https://github.com/Kong/charts/blob/master/charts/kong/CHANGELOG.md)
-- [Upgrading](https://github.com/Kong/charts/blob/master/charts/kong/UPGRADE.md)
+- [Changelog](https://github.com/Kong/charts/blob/main/charts/kong/CHANGELOG.md)
+- [Upgrading](https://github.com/Kong/charts/blob/main/charts/kong/UPGRADE.md)
 - [Seeking help](#seeking-help)
 
 ## Prerequisites
@@ -113,7 +117,7 @@ chart and deletes the release.
 ## FAQs
 
 Please read the
-[FAQs](https://github.com/Kong/charts/blob/master/charts/kong/FAQs.md)
+[FAQs](https://github.com/Kong/charts/blob/main/charts/kong/FAQs.md)
 document.
 
 ## Kong Enterprise
@@ -205,13 +209,37 @@ The package to run can be changed via `image.repository` and `image.tag`
 parameters. If you would like to run the Enterprise package, please read
 the [Kong Enterprise Parameters](#kong-enterprise-parameters) section.
 
+### Configuration method
+
+Kong can be configured via two methods:
+- **Ingress and CRDs**\
+  The configuration for Kong is done via `kubectl` and Kubernetes-native APIs.
+  This is also known as Kong Ingress Controller or Kong for Kubernetes and is
+  the default deployment pattern for this Helm Chart. The configuration
+  for Kong is managed via Ingress and a few
+  [Custom Resources](https://github.com/Kong/kubernetes-ingress-controller/blob/main/docs/concepts/custom-resources.md).
+  For more details, please read the
+  [documentation](https://github.com/Kong/kubernetes-ingress-controller/tree/main/docs)
+  on Kong Ingress Controller.
+  To configure and fine-tune the controller, please read the
+  [Ingress Controller Parameters](#ingress-controller-parameters) section.
+- **Admin API**\
+  This is the traditional method of running and configuring Kong.
+  By default, the Admin API of Kong is not exposed as a Service. This
+  can be controlled via `admin.enabled` and `env.admin_listen` parameters.
+
 ### Separate admin and proxy nodes
 
+*Note: although this section is titled "Separate admin and proxy nodes", this
+split release technique is generally applicable to any deployment with
+different types of Kong nodes. Separating Admin API and proxy nodes is one of
+the more common use cases for splitting across multiple releases, but you can
+also split releases for hybrid mode CP/DP nodes, split proxy and Developer
+Portal nodes, etc.*
+
 Users may wish to split their Kong deployment into multiple instances that only
-run some of Kong's services, e.g. where some nodes only run the proxy and other
-only run the admin API, or where some nodes only run Developer Portal services.
-These require separate Helm releases (i.e. you run `helm install` once for
-every instance type you wish to create).
+run some of Kong's services (i.e. you run `helm install` once for every
+instance type you wish to create).
 
 To disable Kong services on an instance, you should set `SVC.enabled`,
 `SVC.http.enabled`, `SVC.tls.enabled`, and `SVC.ingress.enabled` all to
@@ -239,29 +267,191 @@ environment variables and other common settings, and then several
 instance-specific values.yamls that contain service configuration only. You can
 then create releases with:
 
-```
+```bash
 helm install proxy-only -f shared-values.yaml -f only-proxy.yaml kong/kong
 helm install admin-only -f shared-values.yaml -f only-admin.yaml kong/kong
 ```
 
-### Configuration method
+### Standalone controller nodes
 
-Kong can be configured via two methods:
-- **Ingress and CRDs**\
-  The configuration for Kong is done via `kubectl` and Kubernetes-native APIs.
-  This is also known as Kong Ingress Controller or Kong for Kubernetes and is
-  the default deployment pattern for this Helm Chart. The configuration
-  for Kong is managed via Ingress and a few
-  [Custom Resources](https://github.com/Kong/kubernetes-ingress-controller/blob/master/docs/concepts/custom-resources.md).
-  For more details, please read the
-  [documentation](https://github.com/Kong/kubernetes-ingress-controller/tree/master/docs)
-  on Kong Ingress Controller.
-  To configure and fine-tune the controller, please read the
-  [Ingress Controller Parameters](#ingress-controller-parameters) section.
-- **Admin API**\
-  This is the traditional method of running and configuring Kong.
-  By default, the Admin API of Kong is not exposed as a Service. This
-  can be controlled via `admin.enabled` and `env.admin_listen` parameters.
+The chart can deploy releases that contain the controller only, with no Kong
+container, by setting `deployment.kong.enabled: false` in values.yaml. There
+are several controller settings that must be populated manually in this
+scenario and several settings that are useful when using multiple controllers:
+
+* `ingressController.env.kong_admin_url` must be set to the Kong Admin API URL.
+  If the Admin API is exposed by a service in the cluster, this should look
+  something like `https://my-release-kong-admin.kong-namespace.svc:8444`
+* `ingressController.env.publish_service` must be set to the Kong proxy
+  service, e.g. `namespace/my-release-kong-proxy`.
+* `ingressController.ingressClass` should be set to a different value for each
+  instance of the controller.
+* `ingressController.env.admin_filter_tag` should be set to a different value
+  for each instance of the controller.
+* If using Kong Enterprise, `ingressController.env.kong_workspace` can
+  optionally create configuration in a workspace other than `default`.
+
+Standalone controllers require a database-backed Kong instance, as DB-less mode
+requires that a single controller generate a complete Kong configuration.
+
+### Hybrid mode
+
+Kong supports [hybrid mode
+deployments](https://docs.konghq.com/2.0.x/hybrid-mode/) as of Kong 2.0.0 and
+[Kong Enterprise 2.1.0](https://docs.konghq.com/enterprise/2.1.x/deployment/hybrid-mode/).
+These deployments split Kong nodes into control plane (CP) nodes, which provide
+the admin API and interact with the database, and data plane (DP) nodes, which
+provide the proxy and receive configuration from control plane nodes.
+
+You can deploy hybrid mode Kong clusters by [creating separate releases for each node
+type](#separate-admin-and-proxy-nodes), i.e. use separate control and data
+plane values.yamls that are then installed separately. The [control
+plane](#control-plane-node-configuration) and [data
+plane](#data-plane-node-configuration) configuration sections below cover the
+values.yaml specifics for each.
+
+Cluster certificates are not generated automatically. You must [create a
+certificate and key pair](#certificates) for intra-cluster communication.
+
+#### Certificates
+
+Hybrid mode uses TLS to secure the CP/DP node communication channel, and
+requires certificates for it. You can generate these either using `kong hybrid
+gen_cert` on a local Kong installation or using OpenSSL:
+
+```bash
+openssl req -new -x509 -nodes -newkey ec:<(openssl ecparam -name secp384r1) \
+  -keyout /tmp/cluster.key -out /tmp/cluster.crt \
+  -days 1095 -subj "/CN=kong_clustering"
+```
+
+You must then place these certificates in a Secret:
+
+```bash
+kubectl create secret tls kong-cluster-cert --cert=/tmp/cluster.crt --key=/tmp/cluster.key
+```
+
+#### Control plane node configuration
+
+You must configure the control plane nodes to mount the certificate secret on
+the container filesystem is serve it from the cluster listen. In values.yaml:
+
+```yaml
+secretVolumes:
+- kong-cluster-cert
+```
+
+```yaml
+env:
+  role: control_plane
+  cluster_cert: /etc/secrets/kong-cluster-cert/tls.crt
+  cluster_cert_key: /etc/secrets/kong-cluster-cert/tls.key
+```
+
+Furthermore, you must enable the cluster listen and Kubernetes Service, and
+should typically disable the proxy:
+
+```yaml
+cluster:
+  enabled: true
+  tls:
+    enabled: true
+    servicePort: 8005
+    containerPort: 8005
+
+proxy:
+  enabled: false
+```
+
+Enterprise users with Vitals enabled must also enable the cluster telemetry
+service:
+
+```yaml
+clustertelemetry:
+  enabled: true
+  tls:
+    enabled: true
+    servicePort: 8006
+    containerPort: 8006
+```
+
+If using the ingress controller, you must also specify the DP proxy service as
+its publish target to keep Ingress status information up to date:
+
+```
+ingressController:
+  env:
+    publish_service: hybrid/example-release-data-kong-proxy
+```
+
+Replace `hybrid` with your DP nodes' namespace and `example-release-data` with
+the name of the DP release.
+
+#### Data plane node configuration
+
+Data plane configuration also requires the certificate and `role`
+configuration, and the database should always be set to `off`. You must also
+trust the cluster certificate and indicate what hostname/port Kong should use
+to find control plane nodes.
+
+Though not strictly required, you should disable the admin service (it will not
+work on DP nodes anyway, but should be disabled to avoid creating an invalid
+Service resource).
+
+```yaml
+secretVolumes:
+- kong-cluster-cert
+```
+
+```yaml
+admin:
+  enabled: false
+```
+
+```yaml
+env:
+  role: data_plane
+  database: off
+  cluster_cert: /etc/secrets/kong-cluster-cert/tls.crt
+  cluster_cert_key: /etc/secrets/kong-cluster-cert/tls.key
+  lua_ssl_trusted_certificate: /etc/secrets/kong-cluster-cert/tls.crt
+  cluster_control_plane: control-plane-release-name-kong-cluster.hybrid.svc.cluster.local:8005
+  cluster_telemetry_endpoint: control-plane-release-name-kong-clustertelemetry.hybrid.svc.cluster.local:8006 # Enterprise-only
+```
+
+Note that the `cluster_control_plane` value will differ depending on your
+environment. `control-plane-release-name` will change to your CP release name,
+`hybrid` will change to whatever namespace it resides in. See [Kubernetes'
+documentation on Service
+DNS](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/)
+for more detail.
+
+### CRDs only
+
+For Helm 2 installations, CRDs are managed as part of a release, and are
+deleted if the release is. This can cause issues for clusters with multiple
+Kong installations, as one release must remain in place for the rest to
+function. To avoid this, you can create a CRD-only release by setting
+`deployment.kong.enabled: false` and `ingressController.enabled: false`.
+
+On Helm 3, CRDs are created if necessary, but are not managed along with the
+release. Releases can be deleted without affecting CRDs; CRDs are only removed
+if you delete them manually.
+
+### Sidecar Containers
+
+The chart can deploy additional containers along with the Kong and Ingress
+Controller containers, sometimes referred to as "sidecar containers".  This can
+be useful to include network proxies or logging services along with Kong.  The
+`deployment.sidecarContainers` field in values.yaml takes an array of objects
+that get appended as-is to the existing `spec.template.spec.containers` array
+in the Kong deployment resource.
+
+### Example configurations
+
+Several example values.yaml are available in the
+[example-values](https://github.com/Kong/charts/blob/main/charts/kong/example-values/)
+directory.
 
 ## Configuration
 
@@ -279,8 +469,8 @@ Kong can be configured via two methods:
 | migrations.preUpgrade              | Run "kong migrations up" jobs                                                         | `true`              |
 | migrations.postUpgrade             | Run "kong migrations finish" jobs                                                     | `true`              |
 | migrations.annotations             | Annotations for migration jobs                                                        | `{"sidecar.istio.io/inject": "false", "kuma.io/sidecar-injection": "disabled"}` |
-| waitImage.repository               | Image used to wait for database to become ready                                       | `busybox`           |
-| waitImage.tag                      | Tag for image used to wait for database to become ready                               | `latest`            |
+| waitImage.repository               | Image used to wait for database to become ready                                       | `bash`              |
+| waitImage.tag                      | Tag for image used to wait for database to become ready                               | `5`                 |
 | waitImage.pullPolicy               | Wait image pull policy                                                                | `IfNotPresent`      |
 | postgresql.enabled                 | Spin up a new postgres instance for Kong                                              | `false`             |
 | dblessConfig.configMap             | Name of an existing ConfigMap containing the `kong.yml` file. This must have the key `kong.yml`.| `` |
@@ -300,12 +490,21 @@ individual services: see values.yaml for their individual default values.
 * `manager`
 * `portal`
 * `portalapi`
+* `cluster`
+* `clustertelemetry`
 * `status`
 
 `status` is intended for internal use within the cluster. Unlike other
 services it cannot be exposed externally, and cannot create a Kubernetes
 service or ingress. It supports the settings under `SVC.http` and `SVC.tls`
 only.
+
+`cluster` is used on hybrid mode control plane nodes. It does not support the
+`SVC.http.*` settings (cluster communications must be TLS-only) or the
+`SVC.ingress.*` settings (cluster communication requires TLS client
+authentication, which cannot pass through an ingress proxy). `clustertelemetry`
+is similar, and used when Vitals is enabled on Kong Enterprise control plane
+nodes.
 
 | Parameter                          | Description                                                                           | Default             |
 | ---------------------------------- | ------------------------------------------------------------------------------------- | ------------------- |
@@ -331,7 +530,7 @@ only.
 | SVC.externalTrafficPolicy          | k8s service's externalTrafficPolicy. Options: Cluster, Local                          |                     |
 | SVC.ingress.enabled                | Enable ingress resource creation (works with SVC.type=ClusterIP)                      | `false`             |
 | SVC.ingress.tls                    | Name of secret resource, containing TLS secret                                        |                     |
-| SVC.ingress.hosts                  | List of ingress hosts.                                                                | `[]`                |
+| SVC.ingress.hostname               | Ingress hostname                                                                      | `""`                |
 | SVC.ingress.path                   | Ingress path.                                                                         | `/`                 |
 | SVC.ingress.annotations            | Ingress annotations. See documentation for your ingress controller for details        | `{}`                |
 | SVC.annotations                    | Service annotations                                                                   | `{}`                |
@@ -358,14 +557,13 @@ section of `values.yaml` file:
 | ---------------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | enabled                            | Deploy the ingress controller, rbac and crd                                           | true                                                                         |
 | image.repository                   | Docker image with the ingress controller                                              | kong-docker-kubernetes-ingress-controller.bintray.io/kong-ingress-controller |
-| image.tag                          | Version of the ingress controller                                                     | 0.7.0                                                                        |
+| image.tag                          | Version of the ingress controller                                                     | 0.9.1                                                                        |
 | readinessProbe                     | Kong ingress controllers readiness probe                                              |                                                                              |
 | livenessProbe                      | Kong ingress controllers liveness probe                                               |                                                                              |
-| installCRDs                        | Create CRDs. **FOR HELM3, MAKE SURE THIS VALUE IS SET TO `false`.**                   | true                                                                         |
+| installCRDs                        | Create CRDs. **FOR HELM3, MAKE SURE THIS VALUE IS SET TO `false`.**  Regardless of value of this, Helm v3+ will install the CRDs if those are not present already. Use `--skip-crds` with `helm install` if you want to skip CRD creation.                 | true                                                                         |
 | serviceAccount.create              | Create Service Account for ingress controller                                         | true
 | serviceAccount.name                | Use existing Service Account, specify its name                                        | ""
 | serviceAccount.annotations         | Annotations for Service Account                                                       | {}
-| installCRDs                        | Create CRDs. Regardless of value of this, Helm v3+ will install the CRDs if those are not present already. Use `--skip-crds` with `helm install` if you want to skip CRD creation. | true |
 | env                                | Specify Kong Ingress Controller configuration via environment variables               |                                                                              |
 | ingressClass                       | The ingress-class value for controller                                                | kong                                                                         |
 | args                               | List of ingress-controller cli arguments                                              | []                                                                           |
@@ -375,12 +573,13 @@ section of `values.yaml` file:
 
 For a complete list of all configuration values you can set in the
 `env` section, please read the Kong Ingress Controller's
-[configuration document](https://github.com/Kong/kubernetes-ingress-controller/blob/master/docs/references/cli-arguments.md).
+[configuration document](https://github.com/Kong/kubernetes-ingress-controller/blob/main/docs/references/cli-arguments.md).
 
 ### General Parameters
 
 | Parameter                          | Description                                                                           | Default             |
 | ---------------------------------- | ------------------------------------------------------------------------------------- | ------------------- |
+| deployment.kong.enabled            | Enable or disable deploying Kong                                                      | `true`              |
 | autoscaling.enabled                | Set this to `true` to enable autoscaling                                              | `false`             |
 | autoscaling.minReplicas            | Set minimum number of replicas                                                        | `2`                 |
 | autoscaling.maxReplicas            | Set maximum number of replicas                                                        | `5`                 |
@@ -389,10 +588,12 @@ For a complete list of all configuration values you can set in the
 | updateStrategy                     | update strategy for deployment                                                        | `{}`                |
 | readinessProbe                     | Kong readiness probe                                                                  |                     |
 | livenessProbe                      | Kong liveness probe                                                                   |                     |
+| lifecycle                          | Proxy container lifecycle hooks                                                       | see `values.yaml`   |
 | affinity                           | Node/pod affinities                                                                   |                     |
 | nodeSelector                       | Node labels for pod assignment                                                        | `{}`                |
 | deploymentAnnotations              | Annotations to add to deployment                                                      |  see `values.yaml`  |
 | podAnnotations                     | Annotations to add to each pod                                                        | `{}`                |
+| podLabels                          | Labels to add to each pod                                                             | `{}`                |
 | resources                          | Pod resource requests & limits                                                        | `{}`                |
 | tolerations                        | List of node taints to tolerate                                                       | `[]`                |
 | podDisruptionBudget.enabled        | Enable PodDisruptionBudget for Kong                                                   | `false`             |
@@ -400,12 +601,14 @@ For a complete list of all configuration values you can set in the
 | podDisruptionBudget.minAvailable   | Represents the number of Pods that must be available (integer or percentage)          |                     |
 | podSecurityPolicy.enabled          | Enable podSecurityPolicy for Kong                                                     | `false`             |
 | podSecurityPolicy.spec             | Collection of [PodSecurityPolicy settings](https://kubernetes.io/docs/concepts/policy/pod-security-policy/#what-is-a-pod-security-policy) | |
-| priorityClassName                  | Set pod scheduling priority class for Kong pods                                       | ""                  |
-| serviceMonitor.enabled             | Create ServiceMonitor for Prometheus Operator                                         | false               |
-| serviceMonitor.interval            | Scrapping interval                                                                    | 10s                 |
-| serviceMonitor.namespace           | Where to create ServiceMonitor                                                        |                     |
+| priorityClassName                  | Set pod scheduling priority class for Kong pods                                       | `""`                |
 | secretVolumes                      | Mount given secrets as a volume in Kong container to override default certs and keys. | `[]`                |
-| serviceMonitor.labels              | ServiceMonito Labels                                                                  | {}                  |
+| securityContext                    | Set the securityContext for Kong Pods                                                 | `{}`                |
+| serviceMonitor.enabled             | Create ServiceMonitor for Prometheus Operator                                         | `false`             |
+| serviceMonitor.interval            | Scraping interval                                                                     | `30s`               |
+| serviceMonitor.namespace           | Where to create ServiceMonitor                                                        |                     |
+| serviceMonitor.labels              | ServiceMonitor labels                                                                 | `{}`                |
+| serviceMonitor.targetLabels        | ServiceMonitor targetLabels                                                           | `{}`                |
 
 #### The `env` section
 
@@ -466,11 +669,10 @@ configuration can be placed under the `.env` key.
 
 All Kong Enterprise deployments require a license. If you do not have a copy
 of yours, please contact Kong Support. Once you have it, you will need to
-store it in a Secret. Save your secret in a file named `license` (no extension)
-and then create and inspect your secret:
+store it in a Secret:
 
 ```bash
-$ kubectl create secret generic kong-enterprise-license --from-file=./license
+$ kubectl create secret generic kong-enterprise-license --from-file=license=./license.json
 ```
 
 Set the secret name in `values.yaml`, in the `.enterprise.license_secret` key.
@@ -489,12 +691,6 @@ from \<your username\> \> Edit Profile \> API Key. Use this to create registry
 secrets:
 
 ```bash
-$ kubectl create secret docker-registry kong-enterprise-k8s-docker \
-    --docker-server=kong-docker-kong-enterprise-k8s.bintray.io \
-    --docker-username=<your-bintray-username@kong> \
-    --docker-password=<your-bintray-api-key>
-secret/kong-enterprise-k8s-docker created
-
 $ kubectl create secret docker-registry kong-enterprise-edition-docker \
     --docker-server=kong-docker-kong-enterprise-edition-docker.bintray.io \
     --docker-username=<your-bintray-username@kong> \
@@ -533,8 +729,8 @@ env:
  password:
    valueFrom:
      secretKeyRef:
-        name: CHANGEME-admin-token-secret
-        key: CHANGEME-admin-token-key
+        name: kong-enterprise-superuser-password
+        key: password
 ```
 
 If using the ingress controller, it needs access to the token as well, by
@@ -546,8 +742,8 @@ ingressController:
    kong_admin_token:
      valueFrom:
        secretKeyRef:
-          name: CHANGEME-admin-token-secret
-          key: CHANGEME-admin-token-key
+          name: kong-enterprise-superuser-password
+          key: password
 ```
 
 Although the above examples both use the initial super-admin, we recommend
@@ -598,10 +794,9 @@ Setting `.enterprise.smtp.disabled: true` will set `KONG_SMTP_MOCK=on` and
 allow Admin/Developer invites to proceed without sending email. Note, however,
 that these have limited functionality without sending email.
 
-If your SMTP server requires authentication, you should the `username` and
-`smtp_password_secret` keys under `.enterprise.smtp.auth`.
-`smtp_password_secret` must be a Secret containing an `smtp_password` key whose
-value is your SMTP password.
+If your SMTP server requires authentication, you must provide the `username` and `smtp_password_secret` keys under `.enterprise.smtp.auth`. `smtp_password_secret` must be a Secret containing an `smtp_password` key whose value is your SMTP password.
+
+By default, SMTP uses `AUTH` `PLAIN` when you provide credentials. If your provider requires `AUTH LOGIN`, set `smtp_auth_type: login`.
 
 ## Seeking help
 
