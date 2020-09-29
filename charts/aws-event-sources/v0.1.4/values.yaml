@@ -15,7 +15,7 @@ imagePullSecrets: []
 image:
   registry: gcr.io
   repository: triggermesh/aws-event-sources-controller
-  tag: v0.3.0
+  tag: v0.6.0
   pullPolicy: IfNotPresent
 
 adapters:
@@ -40,10 +40,6 @@ adapters:
   awssqs:
     repository: triggermesh/awssqssource
     tag: ""
-
-knative:
-  urlScheme: http
-  domain: example.com
 
 podAnnotations: {}
 
