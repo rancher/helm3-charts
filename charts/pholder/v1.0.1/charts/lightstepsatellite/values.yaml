@@ -1,0 +1,144 @@
+# Default values for lightstep.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# TODO: Input your satellite key.  Satellites will not run without a valid key.  You may use either a plain text Satellite key or an existing secret with the Satellite key stored.
+
+
+replicaCount: 1
+
+image:
+  repository: lightstep/collector
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: false
+
+service:
+  type: ClusterIP
+  httpPort: 8181
+  grpcinsecure: 8184
+  annotations: {}
+
+
+ingress:
+  enabled: false
+  annotations: {}
+
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# For details on the Lightstep configuration parameters, please refer to: https://docs.lightstep.com/docs/satellite-configuration-parameters
+
+lightstep:
+  # REQUIRED: Input your Satellite API Key
+  satelliteKey: ""
+  # OR
+
+  collector_satellite_key_secret_name: ""
+  collector_satellite_key_secret_key: ""
+
+  # $ kubectl describe secret collector_satellite_key_secret_name
+  # Name:         collector_satellite_key_secret_name
+  # Namespace:    default
+  # Labels:       <none>
+  # Annotations:  <none>
+  # Type:  Opaque
+  # Data
+  # ====
+  # collector_satellite_key_secret_key:  390 bytes
+
+  # Single Project Mode details
+  disable_access_token_checking: false
+  project_name: ""
+
+  # Optional configs
+
+  collector_pool: my-satellite-pool
+  bytes_per_project: "1000000000"
+  bytes_per_project_override:
+  guid:
+  diagnostic_port: 8000
+  admin_plain_port: 8180
+  admin_secure_port: 9090
+  http_plain_port: 8181
+  http_secure_port: 9191
+  grpc_plain_port: 8184
+  grpc_secure_port: 9292
+  plain_port: 8383
+  secure_port: 9393
+  tls_cert_prefix:
+  collector_ingestion_tags:
+
+# Recommended resources would be 16Gi memory and 2 cpu
+resources:
+  limits:
+    memory: 16Gi
+    cpu: 2
+  requests:
+    memory: 16Gi
+    cpu: 2
+
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+statsd:
+  enabled: false
+  host: statsd-exporter
+  port: 9125
+  export_statsd: true                               # If true, dogStatsD will be ignored
+  prefix: "lightstep.prod.us-west-1"
+  satellite_prefix: "satellite-canary"
+  client_prefix: "client_via_canary"
+  dogStatsD: false                                  # If true, will output dogStatsD instead of statsD
+  dogStatsDTags: "pool:us-west-1,canary:true"
+  image:
+    repository: prom/statsd-exporter
+    tag: v0.17.0
+    pullPolicy: IfNotPresent
+  securityContext:
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+  resources: {}
+    # limits:
+    #   memory: 20M
+    #   cpu: 1
+    # requests:
+    #   memory: 15M
+    #   cpu: 1

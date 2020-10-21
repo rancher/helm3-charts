@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: statsd-mapping
+  labels:
+    {{- include "lightstep.labels" . | nindent 4 }}
+data:
+  config: |
+    mappings:
+      - match: "{{ .Values.statsd.prefix }}.{{ .Values.statsd.client_prefix }}.spans.dropped.*"
+        name: "lightstep_client_spans"
+        match_metric_type: counter
+        labels:
+          prefix: "{{ .Values.statsd.prefix }}"
+          client_prefix: "{{ .Values.statsd.client_prefix }}"
+          lightstep_project: "$1"
+          action: "dropped"
+      - match: "{{ .Values.statsd.prefix }}.{{ .Values.statsd.satellite_prefix }}.access_tokens.invalid.*"
+        name: "lightstep_access_token_invalid"
+        match_metric_type: counter
+        labels:
+          prefix: "{{ .Values.statsd.prefix }}"
+          satellite_prefix: "{{ .Values.statsd.satellite_prefix }}"
+          lightstep_project: "$1"
+      - match: "{{ .Values.statsd.prefix }}.{{ .Values.statsd.satellite_prefix }}.bytes.received.*"
+        name: "lightstep_bytes_received"
+        match_metric_type: counter
+        labels:
+          prefix: "{{ .Values.statsd.prefix }}"
+          satellite_prefix: "{{ .Values.statsd.satellite_prefix }}"
+          protocol: "$1"
+      - match: "{{ .Values.statsd.prefix }}.{{ .Values.statsd.satellite_prefix }}.spans.*.*"
+        name: "lightstep_spans"
+        match_metric_type: counter
+        labels:
+          prefix: "{{ .Values.statsd.prefix }}"
+          satellite_prefix: "{{ .Values.statsd.satellite_prefix }}"
+          action: "$1"
+          lightstep_project: "$2"
+      - match: "{{ .Values.statsd.prefix }}.{{ .Values.statsd.satellite_prefix }}.index.queue.length.*"
+        name: "lightstep_index_queue_${3}"
+        match_metric_type: gauge
+        labels:
+          prefix: "{{ .Values.statsd.prefix }}"
+          satellite_prefix: "{{ .Values.statsd.satellite_prefix }}"
+          lightstep_project: "$1"
+      - match: "{{ .Values.statsd.prefix }}.{{ .Values.statsd.satellite_prefix }}.current.recall.seconds.*"
+        name: "lightstep_current_recall_seconds"
+        match_metric_type: gauge
+        labels:
+          prefix: "{{ .Values.statsd.prefix }}"
+          satellite_prefix: "{{ .Values.statsd.satellite_prefix }}"
+          lightstep_project: "$1"
