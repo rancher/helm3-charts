@@ -6,3 +6,6 @@ description: Lightsep satellite to collect telemetry data.
 home: https://lightstep.com/
 icon: https://go.lightstep.com/rs/260-KGM-472/images/logo-medium-color-400x100.jpg
 engine: gotpl
+maintainers:
+  - name: Adam Johnson
+    email: ajohnson@lightstep.com
