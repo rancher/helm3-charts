@@ -1,4 +1,0 @@
-helm-extra-args: --timeout 300s --set lightstep.satelliteKey=$CR_TOKEN,resources.requests.memory=7Gi
-check-version-increment: true
-debug: true
-validate-maintainers: false

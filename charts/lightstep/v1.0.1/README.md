@@ -1,38 +1,82 @@
-# Lightstep Satellite Helm Chart
+# lightstep
 
-This is a helm chart used to deploy a Lightstep satellite.  All configuration should be made in the values.yaml file.  Nothing else should need to be modified.  This does not include metrics monitoring and the extra containers of the StatsD exporter or endpoints.
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
 
-Required Configuration:
+Lightsep satellite to collect telemetry data.
 
-The minimum configuration for this to work is for the user to input either a Satellite API key or point to a kubernetes secret that contains the Satellite API key.
+**Homepage:** <https://lightstep.com/>
 
-If you're using an existing secret, enter the name and key of the secret that stores your satellite API key.  The values.yaml requires values for the secret name and secret key value, as below:
+## Values
 
- > $ kubectl describe secret ${collector_satellite_key_secret_name}
- >
- > Name:         collector_satellite_key_secret_name
- >
- > Namespace:    default
- >
- > Labels:       <none>
- >
- > Annotations:  <none>
- >
- > Type:  Opaque
- >
- > Data
- > 
- > collector_satellite_key_secret_key:  390 bytes
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity | object | `{}` |  |
+| fullnameOverride | string | `""` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.repository | string | `"lightstep/collector"` |  |
+| imagePullSecrets | list | `[]` |  |
+| ingress.annotations | object | `{}` |  |
+| ingress.enabled | bool | `false` |  |
+| ingress.hosts[0].host | string | `"chart-example.local"` |  |
+| ingress.hosts[0].paths | list | `[]` |  |
+| ingress.tls | list | `[]` |  |
+| lightstep.admin_plain_port | int | `8180` |  |
+| lightstep.admin_secure_port | int | `9090` |  |
+| lightstep.bytes_per_project | string | `"1000000000"` |  |
+| lightstep.bytes_per_project_override | string | `nil` |  |
+| lightstep.collector_ingestion_tags | string | `nil` |  |
+| lightstep.collector_pool | string | `"my-satellite-pool"` |  |
+| lightstep.collector_satellite_key_secret_key | string | `""` |  |
+| lightstep.collector_satellite_key_secret_name | string | `""` |  |
+| lightstep.diagnostic_port | int | `8000` |  |
+| lightstep.disable_access_token_checking | bool | `false` |  |
+| lightstep.grpc_plain_port | int | `8184` |  |
+| lightstep.grpc_secure_port | int | `9292` |  |
+| lightstep.guid | string | `nil` |  |
+| lightstep.http_plain_port | int | `8181` |  |
+| lightstep.http_secure_port | int | `9191` |  |
+| lightstep.plain_port | int | `8383` |  |
+| lightstep.project_name | string | `""` |  |
+| lightstep.satelliteKey | string | `""` |  |
+| lightstep.secure_port | int | `9393` |  |
+| lightstep.tls_cert_prefix | string | `nil` |  |
+| nameOverride | string | `""` |  |
+| nodeSelector | object | `{}` |  |
+| podAnnotations."prometheus.io/scrape" | string | `"true"` |  |
+| podSecurityContext | object | `{}` |  |
+| replicaCount | int | `1` |  |
+| resources.limits.cpu | int | `2` |  |
+| resources.limits.memory | string | `"16Gi"` |  |
+| resources.requests.cpu | int | `2` |  |
+| resources.requests.memory | string | `"16Gi"` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| securityContext.runAsNonRoot | bool | `false` |  |
+| service.annotations | object | `{}` |  |
+| service.grpcinsecure | int | `8184` |  |
+| service.httpPort | int | `8181` |  |
+| service.type | string | `"ClusterIP"` |  |
+| serviceAccount.annotations | object | `{}` |  |
+| serviceAccount.create | bool | `false` |  |
+| serviceAccount.name | string | `nil` |  |
+| statsd.client_prefix | string | `"client_via_canary"` |  |
+| statsd.dogStatsD | bool | `false` |  |
+| statsd.dogStatsDTags | string | `"pool:us-west-1,canary:true"` |  |
+| statsd.enabled | bool | `false` |  |
+| statsd.export_statsd | bool | `true` |  |
+| statsd.host | string | `"statsd-exporter"` |  |
+| statsd.image.pullPolicy | string | `"IfNotPresent"` |  |
+| statsd.image.repository | string | `"prom/statsd-exporter"` |  |
+| statsd.image.tag | string | `"v0.17.0"` |  |
+| statsd.port | int | `9125` |  |
+| statsd.prefix | string | `"lightstep.prod.us-west-1"` |  |
+| statsd.resources | object | `{}` |  |
+| statsd.satellite_prefix | string | `"satellite-canary"` |  |
+| statsd.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| statsd.securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| statsd.securityContext.runAsNonRoot | bool | `true` |  |
+| statsd.securityContext.runAsUser | int | `1000` |  |
+| tolerations | list | `[]` |  |
 
-
-Running the helm chart:
-
-In order to install the helm chart, clone the project, input your satellite key (and any other configuration desired) and then run  `helm install satellite lightstep-satellite-helm-chart`, or match the file path to the directory you installed.
-
-Or instal from artifact hub here: https://artifacthub.io/packages/helm/lightstepsatellite/lightstep
-
-
-
-# Contributors
-
-Please delete the charts/lightstepsatellite/README.md and regenerate it with the helm-docs (https://github.com/norwoodj/helm-docs) command.
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.3.0](https://github.com/norwoodj/helm-docs/releases/v1.3.0)
