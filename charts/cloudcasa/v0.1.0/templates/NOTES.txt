@@ -1,0 +1,5 @@
+--------Please be patient while the chart is being deployed--------
+
+Tip: Watch the app deployment status using the command: kubectl get pods -n cloudcasa-io
+
+Monitor the CloudCasa UI's Setup tab. The cluster state should change from Pending to Ready. If the cluster state remains Pending, you may have provided the wrong Cluster ID.
