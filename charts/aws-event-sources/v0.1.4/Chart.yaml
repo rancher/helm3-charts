@@ -16,3 +16,4 @@ maintainers:
   - name: antoineco
 sources:
   - https://github.com/triggermesh/aws-event-sources
+
