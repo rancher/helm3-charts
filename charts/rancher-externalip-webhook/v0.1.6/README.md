@@ -11,7 +11,7 @@ To install the chart with the release name `rancher-externalip-webhook`:
 ```bash
 $ helm repo add rancher-chart https://charts.rancher.io
 $ helm repo update
-$ helm install rancher-external-ip-webhook rancher-chart/rancher-externalip-webhook --namespace cattle-externalip-system -f values.yaml
+$ helm install rancher-externalip-webhook rancher-chart/rancher-externalip-webhook --namespace cattle-externalip-system -f values.yaml
 ```
 
 ## Configuration
@@ -63,7 +63,7 @@ Alternatively, a YAML file that specifies the values for the parameters can be p
 ```bash
 $ helm repo add rancher-chart https://charts.rancher.io
 $ helm repo update
-$ helm install rancher-external-ip-webhook rancher-chart/rancher-externalip-webhook --namespace cattle-externalip-system -f values.yaml
+$ helm install rancher-externalip-webhook rancher-chart/rancher-externalip-webhook --namespace cattle-externalip-system -f values.yaml
 ```
 
 > **Tip**: You can use the default [values.yaml](https://github.com/rancher/externalip-webhook/blob/master/chart/values.yaml)
