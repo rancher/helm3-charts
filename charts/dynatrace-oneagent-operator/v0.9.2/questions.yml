@@ -3,13 +3,13 @@ categories:
 - Monitoring
 questions:
 
-#################### Agent Configuration ####################
+#################### Agent Configuration (REQUIRED) ####################
 - variable: mode
   label: "Monitoring mode"
   description: "Either fullstack for full monitoring or apm for application only monitoring"
   default: "fullstack"
   type: enum
-  group: "Agent Configuration"
+  group: "Agent Configuration (REQUIRED)"
   options:
     - "fullstack"
     - "apm"
@@ -20,15 +20,15 @@ questions:
   default: "https://ENVIRONMENTID.live.dynatrace.com/api"
   type: string
   required: true
-  group: "Agent Configuration"
+  group: "Agent Configuration (REQUIRED)"
 
 - variable: secret.apiToken
   label: "Dynatrace API token"
   description: "Your Dynatrace API token - You can generate this token in your Dynatrace environment"
   default: ""
   type: string
-  required: true
-  group: "Agent Configuration"
+  required: false
+  group: "Agent Configuration (REQUIRED)"
 
 - variable: secret.paasToken
   label: "Dynatrace PaaS token"
@@ -36,7 +36,44 @@ questions:
   default: ""
   type: string
   required: true
-  group: "Agent Configuration"
+  group: "Agent Configuration (REQUIRED)"
+
+  #################### Use custom limits settings ###################
+
+- variable: use_custom_limits_settings
+  label: "Use custom limits settings"
+  description: "Use custom resource limits for the Dynatrace OneAgent"
+  default: false
+  type: boolean
+  group: "Use custom limits settings"
+
+- variable: oneagent.resources.requests.cpu
+  label: "CPU resource request"
+  description: "Defines the minimum requested CPU by the OneAgent"
+  type: string
+  group: "Use custom limits settings"
+  show_if: "use_custom_limits_settings=true"
+
+- variable: oneagent.resources.requests.memory
+  label: "Memory resource request"
+  description: "Defines the minimum requested memory by the OneAgent"
+  type: string
+  group: "Use custom limits settings"
+  show_if: "use_custom_limits_settings=true"
+
+- variable: oneagent.resources.limits.cpu
+  label: "CPU resource limits"
+  description: "Defines the maximum provided CPU for the OneAgent"
+  type: string
+  group: "Use custom limits settings"
+  show_if: "use_custom_limits_settings=true"
+
+- variable: oneagent.resources.limits.memory
+  label: "Memory resource limits"
+  description: "Defines the maximum provided memory for the OneAgent"
+  type: string
+  group: "Use custom limits settings"
+  show_if: "use_custom_limits_settings=true"
 
 #################### Advanced Agent Configuration (OPTIONAL) ####################
 - variable: show_advanced_config
@@ -119,7 +156,7 @@ questions:
 
 - variable: oneagent.trustedCAs
   label: "Add custom CA certificates"
-  description: "Adds the provided CA certficates to the Operator and the OneAgent. Provide your custom certificates here. If this is not set the default embedded certificates on the images will be used"
+  description: "Adds the provided CA certificates to the Operator and the OneAgent. Provide your custom certificates here. If this is not set the default embedded certificates on the images will be used"
   default: ""
   type: multiline
   group: "Advanced Agent Configuration (OPTIONAL)"
@@ -162,16 +199,49 @@ questions:
   group: "Advanced Agent Configuration (OPTIONAL)"
   show_if: "show_advanced_config=true && mode=fullstack"
 
-- variable: oneagent.resources
-  label: "Resource definition for the OneAgent pods"
-  description: "Defines the resources the OneAgent pods can use - Please edit as Yaml for the best experience"
+- variable: oneagent.tolerations
+  label: "Custom tolerations for the OneAgent"
+  description: "Defines custom tolerations to the OneAgent - Please edit as Yaml for the best experience - see https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/"
+  default: ""
   type: string
   group: "Advanced Agent Configuration (OPTIONAL)"
   show_if: "show_advanced_config=true && mode=fullstack"
 
-- variable: oneagent.tolerations
-  label: "Custom tolerations for the OneAgent"
-  description: "Defines custom tolerations to the OneAgent - Please edit as Yaml for the best experience - see https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/"
+- variable: oneagent.networkZone
+  label: "Network zone"
+  description: "Configures a network zone for your OneAgents"
+  default: ""
+  type: string
+  group: "Advanced Agent Configuration (OPTIONAL)"
+  show_if: "show_advanced_config=true"
+
+- variable: oneagent.useUnprivilegedMode
+  label: "Early Adopter: run unprivileged"
+  description: "Early Adopter: support full-stack OneAgent running on unprivileged mode"
+  default: false
+  type: boolean
+  group: "Advanced Agent Configuration (OPTIONAL)"
+  show_if: "show_advanced_config=true && mode=fullstack"
+
+- variable: oneagent.useImmutableImage
+  label: "Use immutable OneAgent image"
+  description: "If set the immutable OneAgent image will be used"
+  default: false
+  type: boolean
+  group: "Advanced Agent Configuration (OPTIONAL)"
+  show_if: "show_advanced_config=true"
+
+- variable: oneagent.agentVersion
+  label: "Agent version for immutable image"
+  description: "Defines the agent version used when immutable image is used - defaults to latest"
+  default: ""
+  type: string
+  group: "Advanced Agent Configuration (OPTIONAL)"
+  show_if: "show_advanced_config=true"
+
+- variable: oneagent.customPullSecret
+  label: "Custom PullSecret for the immutable image"
+  description: "Defines a custom pull secret for the immutable image in case you have your own registry"
   default: ""
   type: string
   group: "Advanced Agent Configuration (OPTIONAL)"

@@ -1,4 +1,4 @@
-# Copyright 2019 Dynatrace LLC
+# Copyright 2020 Dynatrace LLC
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,14 +17,31 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: dynatrace-oneagent
+  name: dynatrace-oneagent-unprivileged
   annotations:
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: "unconfined"
     seccomp.security.alpha.kubernetes.io/allowedProfileNames: "*"
 spec:
-  privileged: true
+  privileged: false
   allowPrivilegeEscalation: true
   allowedCapabilities:
-    - "*"
+    - CHOWN
+    - DAC_OVERRIDE
+    - DAC_READ_SEARCH
+    - FOWNER
+    - FSETID
+    - KILL
+    - NET_ADMIN
+    - NET_RAW
+    - SETFCAP
+    - SETGID
+    - SETUID
+    - SYS_ADMIN
+    - SYS_CHROOT
+    - SYS_PTRACE
+    - SYS_RESOURCE
+  requiredDropCapabilities:
+    - ALL
   volumes:
     - "*"
   hostNetwork: true

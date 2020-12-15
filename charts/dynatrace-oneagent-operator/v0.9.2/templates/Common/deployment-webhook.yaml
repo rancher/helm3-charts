@@ -83,6 +83,8 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 10
           ports:
+            - name: metrics
+              containerPort: 8383
             - name: server-port
               containerPort: 8443
           resources:
@@ -109,6 +111,9 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+          ports:
+            - name: metrics
+              containerPort: 8484
           resources:
             requests:
               cpu: 10m
@@ -120,6 +125,12 @@ spec:
             - name: certs-volume
               mountPath: /mnt/webhook-certs
       serviceAccountName: dynatrace-oneagent-webhook
+      {{- if .Values.operator.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.operator.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.operator.tolerations }}
+      tolerations: {{- toYaml .Values.operator.tolerations | nindent 8 }}
+      {{- end }}
       volumes:
-      - name: certs-volume
-        emptyDir: {}
+        - name: certs-volume
+          emptyDir: {}
