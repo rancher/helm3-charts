@@ -1,0 +1,105 @@
+# The default registry and tag to use for all Kuma images
+global:
+  image:
+    registry: "kong-docker-kuma-docker.bintray.io"
+    # Defaults to .Chart.AppVersion
+    # tag: ""
+
+# Whether or not to patch the target namespace with the system label
+patchSystemNamespace: true
+
+controlPlane:
+  logLevel: "info"
+  mode: "standalone"
+  # zone: ""
+
+  kdsGlobalAddress: ""
+
+  replicas: 1
+
+  nodeSelector:
+    kubernetes.io/os: linux
+    kubernetes.io/arch: amd64
+
+  injectorFailurePolicy: Ignore
+
+  service:
+    # name: ""
+    type: ClusterIP
+    annotations: {}
+
+  globalRemoteSyncService:
+    # name: ""
+    type: LoadBalancer
+    annotations: {}
+    port: 5685
+
+  defaults:
+    skipMeshCreation: false
+
+  #  resources:
+  #     requests:
+  #       cpu: 100m
+  #       memory: 256Mi
+
+  # TLS for various servers
+  tls:
+    general:
+      secretName: ""
+      caBundle: ""
+    apiServer:
+      secretName: ""
+      clientCertsSecretName: ""
+    kdsGlobalServer:
+      secretName: ""
+    kdsRemoteClient:
+      secretName: ""
+
+  image:
+    pullPolicy: IfNotPresent
+    repository: "kuma-cp"
+  # secrets: {}
+
+  envVars: {}
+
+#  config: |
+#    xdsServer:
+#      dataplaneConfigurationRefreshInterval: 2s
+
+cni:
+  enabled: false
+  chained: false
+  netDir: /etc/cni/multus/net.d
+  binDir: /var/lib/cni/bin
+  confName: kuma-cni.conf
+  logLevel: info
+
+  nodeSelector:
+    kubernetes.io/os: linux
+    kubernetes.io/arch: amd64
+
+  image:
+    registry: "docker.io"
+    repository: "lobkovilya/install-cni"
+    tag: "0.0.2"
+
+# Configuration for the kuma dataplane sidecar
+dataPlane:
+  image:
+    repository: "kuma-dp"
+    pullPolicy: IfNotPresent
+
+  # Configuration for the kuma init phase in the sidecar
+  initImage:
+    repository: "kuma-init"
+
+ingress:
+  enabled: false
+  mesh: default
+  drainTime: 30s
+  replicas: 1
+  service:
+    # name: ""
+    type: LoadBalancer
+    annotations: {}
+    port: 10001

@@ -1,0 +1,21 @@
+{{- if eq .Values.controlPlane.mode "global" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kuma.controlPlane.globalRemoteSync.serviceName" . }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- range $key, $value := .Values.controlPlane.globalRemoteSyncService.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
+spec:
+  type: {{ .Values.controlPlane.globalRemoteSyncService.type }}
+  ports:
+    - port: {{ .Values.controlPlane.globalRemoteSyncService.port }}
+  {{- if eq .Values.controlPlane.globalRemoteSyncService.type "NodePort" }}
+      nodePort: 30685
+  {{- end }}
+      name: global-remote-sync
+  selector:
+  {{ include "kuma.selectorLabels" . | nindent 4 }}
+  {{- end }}

@@ -1,0 +1,20 @@
+labels:
+  io.rancher.certified: partner
+  io.cattle.role: project # options are cluster/project
+categories:
+- Service Mesh
+questions:
+- variable: kuma.controlPlane.mode
+  default: "standalone"
+  description: "Kong Mesh Control Plane mode"
+  label: Kong Mesh Control Plane mode
+  type: enum
+  options:
+    - standalone
+    - remote
+    - global
+- variable: kuma.controlPlane.replicas
+  default: 1
+  description: "Number of replicas of them Kong Mesh Control Plane"
+  label: replicas
+  type: integer

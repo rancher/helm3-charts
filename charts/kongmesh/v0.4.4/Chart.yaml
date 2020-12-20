@@ -1,0 +1,11 @@
+apiVersion: v2
+appVersion: 1.0.3
+description: A Helm chart for the Kuma Control Plane
+home: https://github.com/kumahq/kuma
+icon: https://kuma.io/images/brand/kuma-logo-new.svg
+keywords:
+- service mesh
+- control plane
+name: kuma
+type: application
+version: 0.4.4
