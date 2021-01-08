@@ -1,0 +1,3 @@
+labels:
+  io.cattle.role: project # options are cluster/project
+questions:
