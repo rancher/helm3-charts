@@ -21,4 +21,3 @@ iscsi:
 
 # registry prefix for hpe csi images
 registry: "quay.io"
-
