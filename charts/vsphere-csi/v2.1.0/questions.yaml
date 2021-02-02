@@ -1,0 +1,59 @@
+questions: 
+- variable: vCenter.host
+  label: vCenter Host
+  description: Set the vCenter IP address / FQDN
+  type: string
+  required: true
+  group: Configuration
+- variable: vCenter.datacenter
+  description: Comma-separated list of Datacenter paths
+  label: Data Center
+  type: string
+  required: true
+  group: Configuration
+- variable: vCenter.username
+  label: Username
+  description: Username for vCenter
+  type: string
+  required: true
+  group: Configuration
+- variable: vCenter.password
+  label: Password
+  description: Password for vCenter
+  type: password
+  required: true
+  group: Configuration
+- variable: csiMigration
+  label: Enable CSI Migration
+  description: Select this to migrate volumes provisioned by in-tree vSphere provider to CSI
+  type: boolean
+  default: false
+- variable: storageClass.enable
+  default: true
+  label: Create a storageClass with the vSphere CSI provisioner
+  type: boolean
+  show_subquestion_if: true
+  group: "storageClass"
+  subquestions:
+    - variable: storageClass.name
+      label: Name of the storageClass
+      default: "vsphere-csi-sc"
+      type: string
+      required: true
+    - variable: storageClass.default
+      label: Set this as the default storageClass
+      default: "true"
+      type: boolean
+      required: true
+      group: "storageClass"
+    - variable: storageclass.storagePolicyname
+      label: Name of the Storage Policy created in vcenter
+      default: ""
+      type: string
+      required: false
+      group: "storageClass"
+    - variable: storageClass.datastoreURL
+      label: Provide the URL of the datastore to create volumes in, if not specified, any datastore that matches the request will be selected
+      type: "string"
+      required: false
+      group: "storageClass"

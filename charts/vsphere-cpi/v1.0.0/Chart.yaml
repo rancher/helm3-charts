@@ -7,4 +7,4 @@ sources:
   - https://github.com/kubernetes/cloud-provider-vsphere
 maintainers:
   - name: Rancher
-    email: rajashree.28m@gmail.com
+    email: caleb@rancher.com
