@@ -28,7 +28,7 @@ velero_aws_plugin_image:
 velero_image:
   registry: docker.io
   repository: velero/velero
-  tag: v1.5.2
+  tag: v1.5.3
   pullPolicy: IfNotPresent
   debug: false
 ##
