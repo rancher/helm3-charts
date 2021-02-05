@@ -1,0 +1,17 @@
+vCenter:
+  host: ""
+  insecureflag: "1"
+  port: "443"
+  datacenters: ""
+  username: ""
+  password: ""
+
+csiMigration: ""
+
+storageClass:
+  enable: "true"
+  name: ""
+  isDefault: ""
+  storagePolicyName: ""
+
+nodeSelector: {}

@@ -1,0 +1,25 @@
+questions: 
+- variable: vCenter.host
+  label: vCenter Host
+  description: Set the vCenter IP address / FQDN
+  type: string
+  required: true
+  group: Configuration
+- variable: vCenter.datacenters
+  description: Comma-separated list of Datacenter paths
+  label: Data Centers
+  type: string
+  required: true
+  group: Configuration
+- variable: vCenter.username
+  label: Username
+  description: Username for vCenter
+  type: string
+  required: true
+  group: Configuration
+- variable: vCenter.password
+  label: Password
+  description: Password for vCenter
+  type: password
+  required: true
+  group: Configuration
