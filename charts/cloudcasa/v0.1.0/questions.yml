@@ -1,3 +1,4 @@
+namespace: cloudcasa-io
 labels:
   io.rancher.certified: partner
 categories:
