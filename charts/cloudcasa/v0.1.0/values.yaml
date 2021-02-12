@@ -3,7 +3,10 @@
 ## Current available global Docker image parameters: imageRegistry
 ##
 
-## Verlero csi plugin image
+## Required namespace
+namespace: cloudcasa-io
+
+## Velero csi plugin image
 ## ref: https://hub.docker.com/r/velero/velero-plugin-for-csi/tags/
 velero_csi_plugin_image:
   registry: docker.io
