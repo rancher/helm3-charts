@@ -46,10 +46,10 @@ kagent_image:
   debug: false
 ##
 
-## Cloudcasa AMDS Cluster ID. To be provided by the user  
+## Cloudcasa AMDS Cluster ID. To be provided by the user
 cluster_id: ""
 
-## Resources to be used by velero and kubeagent pods 
+## Resources to be used by velero and kubeagent pods
 request_velero_memory: 128Mi
 request_velero_cpu: 500m
 limit_velero_memory: 512Mi
