@@ -6,7 +6,6 @@ kubeVersion: ">=1.13.0-0"
 description: CloudCasa backup service for Kubernetes and cloud native applications
 home: https://cloudcasa.io
 icon: file://../logo.png
-type: application
 keywords:
   - backup
   - Catalogic
