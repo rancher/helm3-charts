@@ -1,0 +1,15 @@
+apiVersion: v2
+name: cloudcasa
+version: 0.1.0
+appVersion: 0.1.0
+kubeVersion: ">=1.13.0-0"
+description: CloudCasa backup service for Kubernetes and cloud native applications
+home: https://cloudcasa.io
+icon: file://../logo.png
+keywords:
+  - backup
+  - Catalogic
+  - CloudCasa
+maintainers:
+  - name: catalogic
+    email: info@catalogicsoftware.com
