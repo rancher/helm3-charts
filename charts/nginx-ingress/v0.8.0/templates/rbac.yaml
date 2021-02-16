@@ -12,6 +12,7 @@ rules:
   resources: 
   - appolicies
   - aplogconfs
+  - apusersigs
   verbs: 
   - get 
   - watch
@@ -103,6 +104,16 @@ rules:
   - virtualserverroutes/status
   verbs:
   - update
+{{- end }}
+{{- if .Values.controller.reportIngressStatus.ingressLink }}
+- apiGroups:
+  - cis.f5.com
+  resources:
+  - ingresslinks
+  verbs:
+  - list
+  - watch
+  - get
 {{- end }}
 ---
 kind: ClusterRoleBinding

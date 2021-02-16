@@ -41,7 +41,7 @@ questions:
     label: NGINX Ingress Controller Image Repository
     required: true
   - variable: controller.image.tag
-    default: 1.9.1
+    default: 1.10.0
     description: "The tag of the Ingress controller image."
     type: string
     label: NGINX Ingress Controller Image Tag

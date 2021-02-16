@@ -7,7 +7,7 @@ This chart deploys the NGINX Ingress controller in your Kubernetes cluster.
 ## Prerequisites
 
   - A [Kubernetes Version Supported by the Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/technical-specifications/#supported-kubernetes-versions)
-  - Helm 2.16+ or 3.0+.
+  - Helm 3.0+.
   - Git.
   - If you’d like to use NGINX Plus:
     - Build an Ingress controller image with NGINX Plus and push it to your private registry by following the instructions from [here](../../build/README.md).
@@ -15,7 +15,7 @@ This chart deploys the NGINX Ingress controller in your Kubernetes cluster.
 
 ## Getting the Chart Sources
 
-This step is required if you're installing the chart using its sources. Additionally, the step is also required for managing the custom resource definitions (CRDs), which the Ingress Controller requires by default: upgrading/deleting the CRDs, or installing the CRDs for Helm 2.x.
+This step is required if you're installing the chart using its sources. Additionally, the step is also required for managing the custom resource definitions (CRDs), which the Ingress Controller requires by default, or for upgrading/deleting the CRDs.
 
 1. Clone the Ingress controller repo:
     ```console
@@ -24,7 +24,7 @@ This step is required if you're installing the chart using its sources. Addition
 2. Change your working directory to /deployments/helm-chart:
     ```console
     $ cd kubernetes-ingress/deployments/helm-chart
-    $ git checkout v1.9.1
+    $ git checkout v1.10.0
     ```
 
 ## Adding the Helm Repository
@@ -40,86 +40,45 @@ $ helm repo update
 
 ### Installing the CRDs
 
-**Note**: If you're using Kubernetes 1.14, make sure to add `--validate=false` to the `kubectl create` command below. Otherwise, you will get an error validating data:
-```
-ValidationError(CustomResourceDefinition.spec): unknown field "preserveUnknownFields" in io.k8s.apiextensions-apiserver.pkg.apis.api extensions.v1beta1.CustomResourceDefinitionSpec
-```
+By default, the Ingress Controller requires a number of custom resource definitions (CRDs) installed in the cluster. The Helm client will install those CRDs.
 
-By default, the Ingress Controller requires a number of custom resource definitions (CRDs) installed in the cluster. Helm 3.x client will install those CRDs. If you're using a Helm 2.x client, you need to install the CRDs via `kubectl`:
-
-```console
-$ kubectl create -f crds/
-```
-
-If you do not use the custom resources that require those CRDs (which corresponds to `controller.enableCustomResources` set to `false` and `controller.appprotect.enable` set to `false`), you can skip the installation of the CRDs. For Helm 2.x, no action is needed, as it does not install the CRDs. For Helm 3.x, specify `--skip-crds` for the helm install command.
+If you do not use the custom resources that require those CRDs (which corresponds to `controller.enableCustomResources` set to `false` and `controller.appprotect.enable` set to `false`). The installation of the CRDs can be skipped by specifying `--skip-crds` for the helm install command.
 
 ### Installing via Helm Repository
 
 To install the chart with the release name my-release (my-release is the name that you choose):
 
-* Using Helm 3.x client:
+For NGINX:
+```console
+$ helm install my-release nginx-stable/nginx-ingress
+```
 
-    For NGINX:
-    ```console
-    $ helm install my-release nginx-stable/nginx-ingress
-    ```
-
-    For NGINX Plus: (assuming you have pushed the Ingress controller image `nginx-plus-ingress` to your private registry `myregistry.example.com`)
-    ```console
-    $ helm install my-release nginx-stable/nginx-ingress --set controller.image.repository=myregistry.example.com/nginx-plus-ingress --set controller.nginxplus=true
-    ```
-
-* Using Helm 2.x client:
-
-    For NGINX:
-    ```console
-    $ helm install --name my-release nginx-stable/nginx-ingress
-    ```
-
-    For NGINX Plus: (assuming you have pushed the Ingress controller image `nginx-plus-ingress` to your private registry `myregistry.example.com`)
-    ```console
-    $ helm install --name my-release nginx-stable/nginx-ingress --set controller.image.repository=myregistry.example.com/nginx-plus-ingress --set controller.nginxplus=true
-    ```
+For NGINX Plus: (assuming you have pushed the Ingress controller image `nginx-plus-ingress` to your private registry `myregistry.example.com`)
+```console
+$ helm install my-release nginx-stable/nginx-ingress --set controller.image.repository=myregistry.example.com/nginx-plus-ingress --set controller.nginxplus=true
+```
 
 ### Installing Using Chart Sources
 
 To install the chart with the release name my-release (my-release is the name that you choose):
 
-* Using Helm 3.x client:
+For NGINX:
+```console
+$ helm install my-release .
+```
 
-    For NGINX:
-    ```console
-    $ helm install my-release .
-    ```
+For NGINX Plus:
+```console
+$ helm install my-release -f values-plus.yaml .
+```
 
-    For NGINX Plus:
-    ```console
-    $ helm install my-release -f values-plus.yaml .
-    ```
+The command deploys the Ingress controller in your Kubernetes cluster in the default configuration. The configuration section lists the parameters that can be configured during installation.
 
-* Using Helm 2.x client:
-
-    For NGINX:
-    ```console
-    $ helm install --name my-release .
-    ```
-
-    For NGINX Plus:
-    ```console
-    $ helm install --name my-release -f values-plus.yaml .
-    ```
-
-    The command deploys the Ingress controller in your Kubernetes cluster in the default configuration. The configuration section lists the parameters that can be configured during installation.
-
-    When deploying the Ingress controller, make sure to use your own TLS certificate and key for the default server rather than the default pre-generated ones. Read the [Configuration](#Configuration) section below to see how to configure a TLS certificate and key for the default server. Note that the default server returns the Not Found page with the 404 status code for all requests for domains for which there are no Ingress rules defined.
-
-> **Tip**: List all releases using `helm list`
+When deploying the Ingress controller, make sure to use your own TLS certificate and key for the default server rather than the default pre-generated ones. Read the [Configuration](#Configuration) section below to see how to configure a TLS certificate and key for the default server. Note that the default server returns the Not Found page with the 404 status code for all requests for domains for which there are no Ingress rules defined.
 
 ## Upgrading the Chart
 
 ### Upgrading the CRDs
-
-**Note**: If you're using Kubernetes 1.14, make sure to add `--validate=false` to the `kubectl apply` command below.
 
 Helm does not upgrade the CRDs during a release upgrade. Before you upgrade a release, run the following command to upgrade the CRDs:
 
@@ -152,17 +111,9 @@ $ helm upgrade my-release nginx-stable/nginx-ingress
 
 To uninstall/delete the release `my-release`:
 
-* Using Helm 3.x client:
-
-    ```console
-    $ helm uninstall my-release
-    ```
-
-* Using Helm 2.x client:
-
-    ```console
-    $ helm delete --purge my-release
-    ```
+```console
+$ helm uninstall my-release
+```
 
 The command removes all the Kubernetes components associated with the release and deletes the release.
 
@@ -195,11 +146,11 @@ Parameter | Description | Default
 `controller.nginxDebug` | Enables debugging for NGINX. Uses the `nginx-debug` binary. Requires `error-log-level: debug` in the ConfigMap via `controller.config.entries`. | false
 `controller.logLevel` | The log level of the Ingress Controller. | 1
 `controller.image.repository` | The image repository of the Ingress controller. | nginx/nginx-ingress
-`controller.image.tag` | The tag of the Ingress controller image. | 1.9.1
+`controller.image.tag` | The tag of the Ingress controller image. | 1.10.0
 `controller.image.pullPolicy` | The pull policy for the Ingress controller image. | IfNotPresent
 `controller.config.name` | The name of the ConfigMap used by the Ingress controller. | Autogenerated
 `controller.config.annotations` | The annotations of the Ingress controller configmap. | {}
-`controller.config.entries` | The entries of the ConfigMap for customizing NGINX configuration. | {}
+`controller.config.entries` | The entries of the ConfigMap for customizing NGINX configuration. See [ConfigMap resource docs](https://docs.nginx.com/nginx-ingress-controller/configuration/global-configuration/configmap-resource/) for the list of supported ConfigMap keys. | {}
 `controller.customPorts` | A list of custom ports to expose on the NGINX ingress controller pod. Follows the conventional Kubernetes yaml syntax for container ports. | []
 `controller.defaultTLS.cert` | The base64-encoded TLS certificate for the default HTTPS server. If not specified, a pre-generated self-signed certificate is used. **Note:** It is recommended that you specify your own certificate. | A pre-generated self-signed certificate.
 `controller.defaultTLS.key` | The base64-encoded TLS key for the default HTTPS server. **Note:** If not specified, a pre-generated key is used. It is recommended that you specify your own key. | A pre-generated key.
@@ -220,6 +171,7 @@ Parameter | Description | Default
 `controller.setAsDefaultIngress` | New Ingresses without an `"ingressClassName"` field specified will be assigned the class specified in `controller.ingressClass`. Only for kubernetes versions >= 1.18. | false
 `controller.watchNamespace` | Namespace to watch for Ingress resources. By default the Ingress controller watches all namespaces. | ""
 `controller.enableCustomResources` | Enable the custom resources. | true
+`controller.enablePreviewPolicies` | Enable preview policies. | false
 `controller.enableTLSPassthrough` | Enable TLS Passthrough on port 443. Requires `controller.enableCustomResources`. | false
 `controller.globalConfiguration.create` | Creates the GlobalConfiguration custom resource. Requires `controller.enableCustomResources`. | false
 `controller.globalConfiguration.spec` | The spec of the GlobalConfiguration for defining the global configuration parameters of the Ingress Controller. | {}
@@ -228,12 +180,13 @@ Parameter | Description | Default
 `controller.healthStatusURI` | Sets the URI of health status location in the default server. Requires `controller.healthStatus`. | "/nginx-health"
 `controller.nginxStatus.enable` | Enable the NGINX stub_status, or the NGINX Plus API. | true
 `controller.nginxStatus.port` | Set the port where the NGINX stub_status or the NGINX Plus API is exposed. | 8080
-`controller.nginxStatus.allowCidrs` | Whitelist IPv4 IP/CIDR blocks to allow access to NGINX stub_status or the NGINX Plus API. Separate multiple IP/CIDR by commas. | 127.0.0.1
+`controller.nginxStatus.allowCidrs` | Add IPv4 IP/CIDR blocks to the allow list for NGINX stub_status or the NGINX Plus API. Separate multiple IP/CIDR by commas. | 127.0.0.1
 `controller.priorityClassName` | The PriorityClass of the Ingress controller pods. | None
 `controller.service.create` | Creates a service to expose the Ingress controller pods. | true
 `controller.service.type` | The type of service to create for the Ingress controller. | LoadBalancer
 `controller.service.externalTrafficPolicy` | The externalTrafficPolicy of the service. The value Local preserves the client source IP. | Local
 `controller.service.annotations` | The annotations of the Ingress controller service. | {}
+`controller.service.extraLabels` | The extra labels of the service. | {}
 `controller.service.loadBalancerIP` | The static IP address for the load balancer. Requires `controller.service.type` set to `LoadBalancer`. The cloud provider must support this feature. | ""
 `controller.service.externalIPs` | The list of external IPs for the Ingress controller service. | []
 `controller.service.loadBalancerSourceRanges` | The IP ranges (CIDR) that are allowed to access the load balancer. Requires `controller.service.type` set to `LoadBalancer`. The cloud provider must support this feature. | []
@@ -248,9 +201,9 @@ Parameter | Description | Default
 `controller.service.httpsPort.nodePort` | The custom NodePort for the HTTPS port. Requires `controller.service.type` set to `NodePort`.  | ""
 `controller.service.httpsPort.targetPort` | The target port of the HTTPS port of the Ingress controller service. | 443
 `controller.serviceAccount.name` | The name of the service account of the Ingress controller pods. Used for RBAC. | Autogenerated
-`controller.serviceAccount.imagePullSecretName` | The name of the secret containing docker registry credentials. | ""
-`controller.reportIngressStatus.enable` | Update the address field in the status of Ingresses resources with an external address of the Ingress controller. You must also specify the source of the external address either through an external service via `controller.reportIngressStatus.externalService` or the `external-status-address` entry in the ConfigMap via `controller.config.entries`. **Note:** `controller.config.entries.external-status-address` takes precedence if both are set. | true
-`controller.reportIngressStatus.externalService` | Specifies the name of the service with the type LoadBalancer through which the Ingress controller is exposed externally. The external address of the service is used when reporting the status of Ingress resources. `controller.reportIngressStatus.enable` must be set to `true`. The default is autogenerated and enabled when `controller.service.create` is set to `true` and `controller.service.type` is set to `LoadBalancer`. | Autogenerated
+`controller.serviceAccount.imagePullSecretName` | The name of the secret containing docker registry credentials. Secret must exist in the same namespace as the helm release. | ""
+`controller.reportIngressStatus.enable` | Updates the address field in the status of Ingress resources with an external address of the Ingress controller. You must also specify the source of the external address either through an external service via `controller.reportIngressStatus.externalService` or the `external-status-address` entry in the ConfigMap via `controller.config.entries`. **Note:** `controller.config.entries.external-status-address` takes precedence if both are set. | true
+`controller.reportIngressStatus.externalService` | Specifies the name of the service with the type LoadBalancer through which the Ingress controller is exposed externally. The external address of the service is used when reporting the status of Ingress, VirtualServer and VirtualServerRoute resources. `controller.reportIngressStatus.enable` must be set to `true`. The default is autogenerated and enabled when `controller.service.create` is set to `true` and `controller.service.type` is set to `LoadBalancer`. | Autogenerated
 `controller.reportIngressStatus.enableLeaderElection` | Enable Leader election to avoid multiple replicas of the controller reporting the status of Ingress resources. `controller.reportIngressStatus.enable` must be set to `true`. | true
 `controller.reportIngressStatus.leaderElectionLockName` | Specifies the name of the ConfigMap, within the same namespace as the controller, used as the lock for leader election. controller.reportIngressStatus.enableLeaderElection must be set to true. | Autogenerated
 `controller.reportIngressStatus.annotations` | The annotations of the leader election configmap. | {}

@@ -1,57 +1,50 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
   name: virtualservers.k8s.nginx.org
-  labels:
-    app.kubernetes.io/name: "nginx-ingress"
 spec:
+  additionalPrinterColumns:
+    - JSONPath: .status.state
+      description: Current state of the VirtualServer. If the resource has a valid status, it means it has been validated and accepted by the Ingress Controller.
+      name: State
+      type: string
+    - JSONPath: .spec.host
+      name: Host
+      type: string
+    - JSONPath: .status.externalEndpoints[*].ip
+      name: IP
+      type: string
+    - JSONPath: .status.externalEndpoints[*].ports
+      name: Ports
+      type: string
+    - JSONPath: .metadata.creationTimestamp
+      name: Age
+      type: date
   group: k8s.nginx.org
-  versions:
-  - name: v1
-    served: true
-    storage: true
+  names:
+    kind: VirtualServer
+    listKind: VirtualServerList
+    plural: virtualservers
+    shortNames:
+      - vs
+    singular: virtualserver
+  preserveUnknownFields: false
   scope: Namespaced
   subresources:
     status: {}
-  names:
-    kind: VirtualServer
-    plural: virtualservers
-    singular: virtualserver
-    shortNames:
-    - vs
-  preserveUnknownFields: false
-  additionalPrinterColumns:
-  - name: State
-    type: string
-    description: Current state of the VirtualServer. If the resource has a valid status,
-      it means it has been validated and accepted by the Ingress Controller.
-    JSONPath: .status.state
-  - name: Host
-    type: string
-    JSONPath: .spec.host
-  - name: IP
-    type: string
-    JSONPath: .status.externalEndpoints[*].ip
-  - name: Ports
-    type: string
-    JSONPath: .status.externalEndpoints[*].ports
-  - name: Age
-    type: date
-    JSONPath: .metadata.creationTimestamp
   validation:
     openAPIV3Schema:
       description: VirtualServer defines the VirtualServer resource.
       type: object
       properties:
         apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           type: string
         kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           type: string
         metadata:
           type: object
@@ -68,8 +61,7 @@ spec:
             policies:
               type: array
               items:
-                description: PolicyReference references a policy by name and an optional
-                  namespace.
+                description: PolicyReference references a policy by name and an optional namespace.
                 type: object
                 properties:
                   name:
@@ -93,8 +85,7 @@ spec:
                         type: object
                         properties:
                           requestHeaders:
-                            description: ProxyRequestHeaders defines the request headers
-                              manipulation in an ActionProxy.
+                            description: ProxyRequestHeaders defines the request headers manipulation in an ActionProxy.
                             type: object
                             properties:
                               pass:
@@ -110,16 +101,13 @@ spec:
                                     value:
                                       type: string
                           responseHeaders:
-                            description: ProxyRequestHeaders defines the response
-                              headers manipulation in an ActionProxy.
+                            description: ProxyResponseHeaders defines the response headers manipulation in an ActionProxy.
                             type: object
                             properties:
                               add:
                                 type: array
                                 items:
-                                  description: Header defines an HTTP Header with
-                                    an optional Always field to use with the add_header
-                                    NGINX directive.
+                                  description: AddHeader defines an HTTP Header with an optional Always field to use with the add_header NGINX directive.
                                   type: object
                                   properties:
                                     always:
@@ -173,8 +161,7 @@ spec:
                           items:
                             type: integer
                         redirect:
-                          description: ErrorPageRedirect defines a redirect for an
-                            ErrorPage.
+                          description: ErrorPageRedirect defines a redirect for an ErrorPage.
                           type: object
                           properties:
                             code:
@@ -220,8 +207,7 @@ spec:
                               type: object
                               properties:
                                 requestHeaders:
-                                  description: ProxyRequestHeaders defines the request headers
-                                    manipulation in an ActionProxy.
+                                  description: ProxyRequestHeaders defines the request headers manipulation in an ActionProxy.
                                   type: object
                                   properties:
                                     pass:
@@ -237,16 +223,13 @@ spec:
                                           value:
                                             type: string
                                 responseHeaders:
-                                  description: ProxyRequestHeaders defines the response
-                                    headers manipulation in an ActionProxy.
+                                  description: ProxyResponseHeaders defines the response headers manipulation in an ActionProxy.
                                   type: object
                                   properties:
                                     add:
                                       type: array
                                       items:
-                                        description: Header defines an HTTP Header with
-                                          an optional Always field to use with the add_header
-                                          NGINX directive.
+                                        description: AddHeader defines an HTTP Header with an optional Always field to use with the add_header NGINX directive.
                                         type: object
                                         properties:
                                           always:
@@ -272,8 +255,7 @@ spec:
                                 upstream:
                                   type: string
                             redirect:
-                              description: ActionRedirect defines a redirect in an
-                                Action.
+                              description: ActionRedirect defines a redirect in an Action.
                               type: object
                               properties:
                                 code:
@@ -323,8 +305,7 @@ spec:
                                     type: object
                                     properties:
                                       requestHeaders:
-                                        description: ProxyRequestHeaders defines the request headers
-                                          manipulation in an ActionProxy.
+                                        description: ProxyRequestHeaders defines the request headers manipulation in an ActionProxy.
                                         type: object
                                         properties:
                                           pass:
@@ -340,16 +321,13 @@ spec:
                                                 value:
                                                   type: string
                                       responseHeaders:
-                                        description: ProxyRequestHeaders defines the response
-                                          headers manipulation in an ActionProxy.
+                                        description: ProxyResponseHeaders defines the response headers manipulation in an ActionProxy.
                                         type: object
                                         properties:
                                           add:
                                             type: array
                                             items:
-                                              description: Header defines an HTTP Header with
-                                                an optional Always field to use with the add_header
-                                                NGINX directive.
+                                              description: AddHeader defines an HTTP Header with an optional Always field to use with the add_header NGINX directive.
                                               type: object
                                               properties:
                                                 always:
@@ -375,8 +353,7 @@ spec:
                                       upstream:
                                         type: string
                                   redirect:
-                                    description: ActionRedirect defines a redirect
-                                      in an Action.
+                                    description: ActionRedirect defines a redirect in an Action.
                                     type: object
                                     properties:
                                       code:
@@ -384,8 +361,7 @@ spec:
                                       url:
                                         type: string
                                   return:
-                                    description: ActionReturn defines a return in
-                                      an Action.
+                                    description: ActionReturn defines a return in an Action.
                                     type: object
                                     properties:
                                       body:
@@ -401,8 +377,7 @@ spec:
                   policies:
                     type: array
                     items:
-                      description: PolicyReference references a policy by name and
-                        an optional namespace.
+                      description: PolicyReference references a policy by name and an optional namespace.
                       type: object
                       properties:
                         name:
@@ -424,13 +399,11 @@ spec:
                             pass:
                               type: string
                             proxy:
-                              description: ActionProxy defines a proxy in an
-                                Action.
+                              description: ActionProxy defines a proxy in an Action.
                               type: object
                               properties:
                                 requestHeaders:
-                                  description: ProxyRequestHeaders defines the
-                                    request headers manipulation in an ActionProxy.
+                                  description: ProxyRequestHeaders defines the request headers manipulation in an ActionProxy.
                                   type: object
                                   properties:
                                     pass:
@@ -438,8 +411,7 @@ spec:
                                     set:
                                       type: array
                                       items:
-                                        description: Header defines an HTTP
-                                          Header.
+                                        description: Header defines an HTTP Header.
                                         type: object
                                         properties:
                                           name:
@@ -447,16 +419,13 @@ spec:
                                           value:
                                             type: string
                                 responseHeaders:
-                                  description: ProxyRequestHeaders defines the
-                                    response headers manipulation in an ActionProxy.
+                                  description: ProxyResponseHeaders defines the response headers manipulation in an ActionProxy.
                                   type: object
                                   properties:
                                     add:
                                       type: array
                                       items:
-                                        description: Header defines an HTTP
-                                          Header with an optional Always field
-                                          to use with the add_header NGINX directive.
+                                        description: AddHeader defines an HTTP Header with an optional Always field to use with the add_header NGINX directive.
                                         type: object
                                         properties:
                                           always:
@@ -482,8 +451,7 @@ spec:
                                 upstream:
                                   type: string
                             redirect:
-                              description: ActionRedirect defines a redirect in an
-                                Action.
+                              description: ActionRedirect defines a redirect in an Action.
                               type: object
                               properties:
                                 code:
@@ -531,8 +499,7 @@ spec:
                   buffering:
                     type: boolean
                   buffers:
-                    description: UpstreamBuffers defines Buffer Configuration for
-                      an Upstream.
+                    description: UpstreamBuffers defines Buffer Configuration for an Upstream.
                     type: object
                     properties:
                       number:
@@ -546,8 +513,7 @@ spec:
                   fail-timeout:
                     type: string
                   healthCheck:
-                    description: HealthCheck defines the parameters for active Upstream
-                      HealthChecks.
+                    description: HealthCheck defines the parameters for active Upstream HealthChecks.
                     type: object
                     properties:
                       connect-timeout:
@@ -583,8 +549,7 @@ spec:
                       statusMatch:
                         type: string
                       tls:
-                        description: UpstreamTLS defines a TLS configuration for an
-                          Upstream.
+                        description: UpstreamTLS defines a TLS configuration for an Upstream.
                         type: object
                         properties:
                           enable:
@@ -608,8 +573,7 @@ spec:
                   port:
                     type: integer
                   queue:
-                    description: UpstreamQueue defines Queue Configuration for an
-                      Upstream.
+                    description: UpstreamQueue defines Queue Configuration for an Upstream.
                     type: object
                     properties:
                       size:
@@ -623,8 +587,7 @@ spec:
                   service:
                     type: string
                   sessionCookie:
-                    description: SessionCookie defines the parameters for session
-                      persistence.
+                    description: SessionCookie defines the parameters for session persistence.
                     type: object
                     properties:
                       domain:
@@ -654,15 +617,13 @@ spec:
                       enable:
                         type: boolean
         status:
-          description: VirtualServerStatus defines the status for the VirtualServer
-            resource.
+          description: VirtualServerStatus defines the status for the VirtualServer resource.
           type: object
           properties:
             externalEndpoints:
               type: array
               items:
-                description: ExternalEndpoint defines the IP and ports used to connect
-                  to this resource.
+                description: ExternalEndpoint defines the IP and ports used to connect to this resource.
                 type: object
                 properties:
                   ip:
@@ -675,3 +636,14 @@ spec:
               type: string
             state:
               type: string
+  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
