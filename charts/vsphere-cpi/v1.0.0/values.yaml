@@ -3,7 +3,6 @@ vCenter:
   insecureflag: "1"
   port: "443"
   datacenters: ""
-  username: ""
-  password: ""
+  credentialsSecretName: ""
 
 nodeSelector: {}
