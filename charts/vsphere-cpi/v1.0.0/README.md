@@ -10,16 +10,20 @@
 
 ## Installation
 
-This chart requires a secret in your Kubernetes cluster that contains the server URL and credentials to connect to the vCenter. You can have the chart generate it for you, or create it yourself and provide the name of the secret during installation. (<span style="color:orange">Warning</span>: When the option to generate the secret is enabled, the credentials are visible in the API to authorized users. If you create the secret yourself they will not be visible). You can create it in one of the following ways:
-### <B>Option 1</b>: Create a secret using the Rancher UI
+This chart requires a Secret in your Kubernetes cluster that contains the server URL and credentials to connect to the vCenter. You can have the chart generate it for you, or create it yourself and provide the name of the Secret during installation. 
+
+<span style="color:orange">Warning</span>: When the option to generate the Secret is enabled, the credentials are visible in the API to authorized users. If you create the Secret yourself they will not be visible.
+
+You can create a Secret in one of the following ways:
+### <B>Option 1</b>: Create a Secret using the Rancher UI
 Go to your cluster's project (Same project you will be installing the chart) > Resources > Secrets > Add Secret.
 ```yaml
-# Example of data required in the secret
+# Example of data required in the Secret
 <host-1>.username: <username>
 <host-1>.password: <password>
 ```
 
-### <B>Option 2</b>: Create a secret using kubectl
+### <B>Option 2</b>: Create a Secret using kubectl
 Replace placeholders with actual values, and execute the following:
 ```bash
 cat <<EOF | kubectl apply -f -
@@ -34,6 +38,8 @@ data:
     <host-1>.password: <base64encoded-password>
 EOF
 ```
+
+More information on managing Secrets using kubectl [here](https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-kubectl/).
 
 ## Migration
 

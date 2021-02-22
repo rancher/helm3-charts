@@ -3,7 +3,9 @@ vCenter:
   insecureflag: "1"
   port: "443"
   datacenters: ""
-  credentialsSecretName: ""
-  generateCredentialsSecret: false
+  username: ""
+  password: ""
+  credentialsSecretName: "vsphere-cpi-creds"
+  generateCredentialsSecret: true
 
 nodeSelector: {}
