@@ -4,5 +4,6 @@ vCenter:
   port: "443"
   datacenters: ""
   credentialsSecretName: ""
+  generateCredentialsSecret: false
 
 nodeSelector: {}

@@ -4,19 +4,36 @@
 
 ## Prerequisites
 
-- vSphere 6.7U3+
-- Secret with vSphere credentials
+- vSphere 6.7 U3+
+- Kubernetes v1.14+
+- A Secret on your Kubernetes cluster that contains vSphere credentials (Refer to `README` or `Detailed Descriptions`)
 
 ## Installation
 
-1. Before installing the chart, you need to create a secret in the chart's namespace with the server URL and credentials to connect to the vCenter. To create a secret in Rancher, go to your cluster's project (Same project you will be installing the chart) > Resources > Secrets > Add Secret
-    ```yaml
-    # Example of data required in the secret
-    <host-1>.username: <username>
-    <host-1>.password: <password>
-    ```
+This chart requires a secret in your Kubernetes cluster that contains the server URL and credentials to connect to the vCenter. You can have the chart generate it for you, or create it yourself and provide the name of the secret during installation. (<span style="color:orange">Warning</span>: When the option to generate the secret is enabled, the credentials are visible in the API to authorized users. If you create the secret yourself they will not be visible). You can create it in one of the following ways:
+### <B>Option 1</b>: Create a secret using the Rancher UI
+Go to your cluster's project (Same project you will be installing the chart) > Resources > Secrets > Add Secret.
+```yaml
+# Example of data required in the secret
+<host-1>.username: <username>
+<host-1>.password: <password>
+```
 
-2. Install the chart, and make sure to provide the same name of the credential's secret you created.
+### <B>Option 2</b>: Create a secret using kubectl
+Replace placeholders with actual values, and execute the following:
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+    name: <secret-name>
+    namespace: <charts-namespace>
+data:
+    <host-1>.username: <base64encoded-username>
+    <host-1>.password: <base64encoded-password>
+EOF
+```
 
 ## Migration
 

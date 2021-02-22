@@ -6,7 +6,7 @@ metadata:
 data:
   vsphere.conf: |
     [Global]
-    secret-name = {{ .Values.vCenter.credentialsSecretName | quote }}
+    secret-name = {{ .Values.vCenter.credentialsSecretName | default "vsphere-cpi-creds" | quote }}
     secret-namespace = {{ .Release.Namespace | quote }}
     port = {{ .Values.vCenter.port | default "443" | quote }}
     insecure-flag = {{ .Values.vCenter.insecureflag | default "1" | quote }}

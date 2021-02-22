@@ -4,5 +4,6 @@
 
 ## Prerequisites
 
-- vSphere 6.7U3+
-- Secret with vSphere credentials (Refer to `README` or `Detailed Descriptions`)
+- vSphere 6.7 U3+
+- Kubernetes v1.14+
+- A Secret on your Kubernetes cluster that contains vSphere credentials (Refer to `README` or `Detailed Descriptions`)
