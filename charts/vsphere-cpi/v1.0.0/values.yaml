@@ -5,5 +5,7 @@ vCenter:
   datacenters: ""
   username: ""
   password: ""
+  credentialsSecretName: "vsphere-cpi-creds"
+  generateCredentialsSecret: true
 
 nodeSelector: {}
