@@ -1,8 +1,8 @@
-{{- if .Values.storageClass.enable }}
+{{- if .Values.storageClass.enabled -}}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
- name: {{ .Values.storageClass.name | default "vsphere-csi-sc" | quote }}
+ name: {{ .Values.storageClass.name | quote }}
  annotations:
   storageclass.kubernetes.io/is-default-class: {{ .Values.storageClass.isDefault | quote }}
 provisioner: csi.vsphere.vmware.com
@@ -10,7 +10,7 @@ parameters:
   {{- if .Values.storageClass.datastoreURL  }}
   datastoreURL: {{ .Values.storageClass.datastoreURL | quote }}
   {{- end }}
-  {{- if .Values.storageClass.storagePolicyname }}
-  storagepolicyname: {{ .Values.storageClass.storagePolicyname | quote }}
+  {{- if .Values.storageClass.storagePolicyName }}
+  storagepolicyname: {{ .Values.storageClass.storagePolicyName | quote }}
   {{- end }}
-{{- end }}
+{{- end -}}

@@ -1,60 +1,79 @@
 rancher_min_version: 2.5.6-rc1
+rancher_max_version: 2.5.6-rc99
 questions:
-- variable: vCenter.host
-  label: vCenter Host
-  description: Set the vCenter IP address / FQDN
-  type: string
-  required: true
-  group: Configuration
-- variable: vCenter.datacenter
-  description: Comma-separated list of Datacenter paths
-  label: Data Center
-  type: string
-  required: true
-  group: Configuration
-- variable: vCenter.username
-  label: Username
-  description: Username for vCenter
-  type: string
-  required: true
-  group: Configuration
-- variable: vCenter.password
-  label: Password
-  description: Password for vCenter
-  type: password
-  required: true
-  group: Configuration
-- variable: csiMigration
-  label: Enable CSI Migration
-  description: Select this to migrate volumes provisioned by in-tree vSphere provider to CSI
-  type: boolean
-  default: false
-- variable: storageClass.enable
-  default: true
-  label: Create a storageClass with the vSphere CSI provisioner
-  type: boolean
-  show_subquestion_if: true
-  group: "storageClass"
-  subquestions:
-    - variable: storageClass.name
-      label: Name of the storageClass
-      default: "vsphere-csi-sc"
-      type: string
-      required: true
-    - variable: storageClass.default
-      label: Set this as the default storageClass
-      default: "true"
-      type: boolean
-      required: true
-      group: "storageClass"
-    - variable: storageclass.storagePolicyname
-      label: Name of the Storage Policy created in vcenter
-      default: ""
-      type: string
-      required: false
-      group: "storageClass"
-    - variable: storageClass.datastoreURL
-      label: Provide the URL of the datastore to create volumes in, if not specified, any datastore that matches the request will be selected
-      type: "string"
-      required: false
-      group: "storageClass"
+  - variable: vCenter.generateCsiVSphereConfSecret
+    label: Generate CSI vSphere Config Secret
+    description: Generates a Secret that contains a CSI vSphere config and credentials (If the option to generate it is enabled, credentials will be visible in the API to authorized users)
+    type: boolean
+    default: true
+    required: true
+    group: Configuration
+    show_subquestion_if: true
+    subquestions:
+      - variable: vCenter.host
+        label: vCenter Host
+        description: IP address or FQDN of the vCenter
+        type: string
+        group: Configuration
+
+      - variable: vCenter.datacenters
+        description: Comma-separated list of paths to data centers. E.g "<dc1-path>, <dc2-path>, ..."
+        label: Data Centers
+        type: string
+        group: Configuration
+
+      - variable: vCenter.username
+        label: Username
+        description: Username for vCenter
+        type: string
+        group: Configuration
+
+      - variable: vCenter.password
+        label: Password
+        description: Password for vCenter
+        type: password
+        group: Configuration
+
+  - variable: vCenter.csiVSphereConfSecretName
+    label: CSI vSphere Config Secret Name
+    description: Name of the Secret that contains a CSI vSphere config and credentials (Will not be visible in the API. More info in the README)
+    type: string
+    group: Configuration
+    show_if: "vCenter.generateCsiVSphereConfSecret=false"
+
+  - variable: csiMigration.enabled
+    label: Enable CSI Migration
+    description: Enable migration of volumes provisioned by in-tree vSphere provider to CSI
+    type: boolean
+    default: false
+    group: Migration
+
+  - variable: storageClass.enabled
+    default: true
+    label: Create Storage Class
+    description: Create a storageClass with the vSphere CSI provisioner
+    type: boolean
+    required: true
+    show_subquestion_if: true
+    group: Storage
+    subquestions:
+      - variable: storageClass.name
+        label: Storage Class Name
+        default: "vsphere-csi-sc"
+        type: string
+
+      - variable: storageClass.isDefault
+        label: Default Storage Class
+        description: Set the Storage Class as the default
+        default: true
+        type: boolean
+
+      - variable: storageClass.storagePolicyName
+        label: Storage Policy Name
+        description: Name of the Storage Policy created in vCenter
+        type: string
+
+      - variable: storageClass.datastoreURL
+        label: Data Store URL
+        description: URL of the data store to use for new volumes (If unspecified, any data store that matches the request will be selected).
+        type: string
