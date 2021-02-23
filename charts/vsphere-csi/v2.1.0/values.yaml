@@ -5,18 +5,19 @@ vCenter:
   insecureFlag: true
   username: ""
   password: ""
-  generateCsiVSphereConfSecret: true
-  csiVSphereConfSecretName: "vsphere-config-secret"
-  csiVSphereConfTemplate: |
-    [Global]
-    cluster-id = {{ uuidv4 }}
-    user = {{ .Values.vCenter.username | quote }}
-    password = {{ .Values.vCenter.password | quote }}
-    port = {{ .Values.vCenter.port | quote }}
-    insecure-flag = {{ .Values.vCenter.insecureFlag | quote }}
+  configSecret:
+    name: "vsphere-config-secret"
+    generate: true
+    configTemplate: |
+      [Global]
+      cluster-id = {{ uuidv4 | quote }}
+      user = {{ .Values.vCenter.username | quote }}
+      password = {{ .Values.vCenter.password | quote }}
+      port = {{ .Values.vCenter.port | quote }}
+      insecure-flag = {{ .Values.vCenter.insecureFlag | quote }}
 
-    [VirtualCenter {{ .Values.vCenter.host | quote }}]
-    datacenters = {{ .Values.vCenter.datacenters | quote }}
+      [VirtualCenter {{ .Values.vCenter.host | quote }}]
+      datacenters = {{ .Values.vCenter.datacenters | quote }}
 
 csiMigration:
   enabled: false

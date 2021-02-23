@@ -1,7 +1,7 @@
 rancher_min_version: 2.5.6-rc1
 rancher_max_version: 2.5.6-rc99
 questions:
-  - variable: vCenter.generateCsiVSphereConfSecret
+  - variable: vCenter.configSecret.generate
     label: Generate CSI vSphere Config Secret
     description: Generates a Secret that contains a CSI vSphere config and credentials (If the option to generate it is enabled, credentials will be visible in the API to authorized users)
     type: boolean
@@ -34,16 +34,16 @@ questions:
         type: password
         group: Configuration
 
-  - variable: vCenter.csiVSphereConfSecretName
+  - variable: vCenter.configSecret.name
     label: CSI vSphere Config Secret Name
     description: Name of the Secret that contains a CSI vSphere config and credentials (Will not be visible in the API. More info in the README)
     type: string
     group: Configuration
-    show_if: "vCenter.generateCsiVSphereConfSecret=false"
+    show_if: "vCenter.configSecret.generate=false"
 
   - variable: csiMigration.enabled
     label: Enable CSI Migration
-    description: Enable migration of volumes provisioned by in-tree vSphere provider to CSI
+    description: Enable migration of volumes provisioned by in-tree vSphere provider to CSI (Available for vSphere 7.0 U1 only)
     type: boolean
     default: false
     group: Migration

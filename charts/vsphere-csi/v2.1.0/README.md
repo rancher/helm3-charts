@@ -1,8 +1,10 @@
-# vSphere Cloud Provider Interface (CSI)
+# vSphere Container Storage Interface (CSI)
 
-[vSphere Cloud Provider Interface (CSI)](https://github.com/kubernetes-sigs/vsphere-csi-driver/tree/release-2.1/manifests/v2.1.0/vsphere-7.0u1/) is a specification designed to enable persistent storage volume management on Container Orchestrators (COs) such as Kubernetes. The specification allows storage systems to integrate with containerized workloads running on Kubernetes. Using CSI, storage providers, such as VMware, can write and deploy plugins for storage systems in Kubernetes without a need to modify any core Kubernetes code.
+[vSphere Container Storage Interface (CSI)](https://github.com/kubernetes-sigs/vsphere-csi-driver/tree/release-2.1/manifests/v2.1.0/vsphere-7.0u1/) is a specification designed to enable persistent storage volume management on Container Orchestrators (COs) such as Kubernetes. The specification allows storage systems to integrate with containerized workloads running on Kubernetes. Using CSI, storage providers, such as VMware, can write and deploy plugins for storage systems in Kubernetes without a need to modify any core Kubernetes code.
 
-CSI allows volume plugins to be installed on Kubernetes clusters as extensions. Once a CSI compatible volume driver is deployed on a Kubernetes cluster, users can use the CSI to provision, attach, mount, and format the volumes exposed by the CSI driver. For vSphere, the CSI driver is csi.vsphere.vmware.com.
+CSI allows volume plugins to be installed on Kubernetes clusters as extensions. Once a CSI compatible volume driver is deployed on a Kubernetes cluster, users can use the CSI to provision, attach, mount, and format the volumes exposed by the CSI driver.
+
+The CSI driver for vSphere is `csi.vsphere.vmware.com`.
 
 ## Prerequisites
 
@@ -13,7 +15,7 @@ CSI allows volume plugins to be installed on Kubernetes clusters as extensions. 
 
 ## Installation
 
-This chart requires a Secret in your Kubernetes cluster that contains the CSI configuration and credentials to connect to the vCenter. You can have the chart generate it for you, or create it yourself and provide the name of the Secret during installation. 
+This chart requires a Secret in your Kubernetes cluster that contains the CSI configuration and credentials to connect to the vCenter. You can have the chart generate it for you, or create it yourself and provide the name of the Secret during installation.
 
 <span style="color:orange">Warning</span>: When the option to generate the Secret is enabled, the credentials are visible in the API to authorized users. If you create the Secret yourself they will not be visible.
 
@@ -42,6 +44,7 @@ More information on CSI vSphere configuration [here](https://vsphere-csi-driver.
 
 Replace placeholders with actual values, and execute the following:
 ```bash
+# The csi-vsphere.conf key name is required, otherwise the installation will fail
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Secret
@@ -64,3 +67,7 @@ EOF
 ```
 
 More information on managing Secrets using kubectl [here](https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-kubectl/).
+
+## Migration
+
+The CSI migration feature is only available for vSphere 7.0 U1.
