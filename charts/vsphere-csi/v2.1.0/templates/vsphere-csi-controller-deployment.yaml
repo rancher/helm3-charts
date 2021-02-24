@@ -152,13 +152,13 @@ spec:
       volumes:
       - name: vsphere-config-volume
         secret:
-          secretName: vsphere-config-secret
+          secretName: {{ .Values.vCenter.configSecret.name }}
       - name: socket-dir
         emptyDir: {}
 ---
 apiVersion: v1
 data:
-  "csi-migration": {{ .Values.csiMigration | quote }} # csi-migration feature is only available for vSphere 7.0U1
+  "csi-migration": {{ .Values.csiMigration.enabled | quote }}
 kind: ConfigMap
 metadata:
   name: internal-feature-states.csi.vsphere.vmware.com
