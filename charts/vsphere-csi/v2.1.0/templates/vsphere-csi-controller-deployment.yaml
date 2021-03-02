@@ -44,6 +44,7 @@ spec:
           volumeMounts:
             - mountPath: /csi
               name: socket-dir
+{{- if .Values.csiResizer.enabled }}
         - name: csi-resizer
           image: quay.io/k8scsi/csi-resizer:v1.0.0
           args:
@@ -57,6 +58,7 @@ spec:
           volumeMounts:
             - mountPath: /csi
               name: socket-dir
+{{- end }}
         - name: vsphere-csi-controller
           image: gcr.io/cloud-provider-vsphere/csi/release/driver:v2.1.0
           args:

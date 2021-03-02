@@ -22,6 +22,9 @@ vCenter:
 csiMigration:
   enabled: false
 
+csiResizer:
+  enabled: false
+
 storageClass:
   enabled: true
   name: "vsphere-csi-sc"
