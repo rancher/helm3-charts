@@ -43,10 +43,17 @@ questions:
 
   - variable: csiMigration.enabled
     label: Enable CSI Migration
-    description: Enable migration of volumes provisioned by in-tree vSphere provider to CSI (Available for vSphere 7.0 U1 only)
+    description: Enable migration of volumes provisioned by in-tree vSphere provider to CSI (Available for vSphere 7.0 U1+ only)
     type: boolean
     default: false
     group: Migration
+
+  - variable: csiResizer.enabled
+    label: Enable CSI Volume Resizer
+    description: This feature is available for vSphere 7.0 U1+ only
+    type: boolean
+    default: false
+    group: Storage
 
   - variable: storageClass.enabled
     default: true
