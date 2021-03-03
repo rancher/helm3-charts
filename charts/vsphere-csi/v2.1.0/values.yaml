@@ -24,22 +24,22 @@ csiController:
   csiResizer:
     enabled: false
   image:
-    repository: gcr.io/cloud-provider-vsphere/csi/release/driver
+    repository: rancher/mirrored-cloud-provider-vsphere-csi-release-driver
     tag: v2.1.0
     csiAttacher:
-      repository: quay.io/k8scsi/csi-attacher
+      repository: rancher/mirrored-k8scsi-csi-attacher
       tag: v3.0.0
     csiResizer:
-      repository: quay.io/k8scsi/csi-resizer
+      repository: rancher/mirrored-k8scsi-csi-resizer
       tag: v1.0.0
     livenessProbe:
-      repository: quay.io/k8scsi/livenessprobe
+      repository: rancher/mirrored-k8scsi-livenessprobe
       tag: v2.1.0
     vsphereSyncer:
-      repository: gcr.io/cloud-provider-vsphere/csi/release/syncer
+      repository: rancher/mirrored-cloud-provider-vsphere-csi-release-syncer
       tag: v2.1.0
     csiProvisioner:
-      repository: quay.io/k8scsi/csi-provisioner
+      repository: rancher/mirrored-k8scsi-csi-provisioner
       tag: v2.0.0
   nodeSelector: {}
 
@@ -49,13 +49,13 @@ csiMigration:
 csiNode:
   prefixPath: ""
   image:
-    repository: gcr.io/cloud-provider-vsphere/csi/release/driver
+    repository: rancher/mirrored-cloud-provider-vsphere-csi-release-driver
     tag: v2.1.0
     nodeDriverRegistrar:
-      repository: quay.io/k8scsi/csi-node-driver-registrar
+      repository: rancher/mirrored-k8scsi-csi-node-driver-registrar
       tag: v2.0.1
     livenessProbe:
-      repository: quay.io/k8scsi/livenessprobe
+      repository: rancher/mirrored-k8scsi-livenessprobe
       tag: v2.1.0
 
 storageClass:
