@@ -1,7 +1,7 @@
 rancher_min_version: 2.5.6-rc1
 rancher_max_version: 2.5.6-rc99
 questions:
-  - variable: vCenter.configSecret.generate
+  - variable: csiController.vsphereConfig.generate
     label: Generate CSI vSphere Config Secret
     description: Generates a Secret that contains a CSI vSphere config and credentials (If the option to generate it is enabled, credentials will be visible in the API to authorized users)
     type: boolean
@@ -10,36 +10,36 @@ questions:
     group: Configuration
     show_subquestion_if: true
     subquestions:
-      - variable: vCenter.host
+      - variable: csiController.vsphereConfig.host
         label: vCenter Host
         description: IP address or FQDN of the vCenter
         type: string
         group: Configuration
 
-      - variable: vCenter.datacenters
+      - variable: csiController.vsphereConfig.datacenters
         description: Comma-separated list of paths to data centers. E.g "<dc1-path>, <dc2-path>, ..."
         label: Data Centers
         type: string
         group: Configuration
 
-      - variable: vCenter.username
+      - variable: csiController.vsphereConfig.username
         label: Username
         description: Username for vCenter
         type: string
         group: Configuration
 
-      - variable: vCenter.password
+      - variable: csiController.vsphereConfig.password
         label: Password
         description: Password for vCenter
         type: password
         group: Configuration
 
-  - variable: vCenter.configSecret.name
+  - variable: csiController.vsphereConfig.name
     label: CSI vSphere Config Secret Name
     description: Name of the Secret that contains a CSI vSphere config and credentials (Will not be visible in the API. More info in the README)
     type: string
     group: Configuration
-    show_if: "vCenter.configSecret.generate=false"
+    show_if: "csiController.vsphereConfig.generate=false"
 
   - variable: csiMigration.enabled
     label: Enable CSI Migration
@@ -48,7 +48,7 @@ questions:
     default: false
     group: Migration
 
-  - variable: csiResizer.enabled
+  - variable: csiController.csiResizer.enabled
     label: Enable CSI Volume Resizer
     description: This feature is available for vSphere 7.0 U1+ only
     type: boolean
@@ -84,3 +84,31 @@ questions:
         label: Data Store URL
         description: URL of the data store to use for new volumes (If unspecified, any data store that matches the request will be selected).
         type: string
+
+  - variable: csiNode.driverRegSockPath
+    label: Driver Registration Socket Path
+    description: Path to the driver's registration socket in the CSI node daemonset
+    type: string
+    default: /opt/rke/var/lib/kubelet/plugins/csi.vsphere.vmware.com/csi.sock
+    group: Node
+
+  - variable: csiNode.registrationDir
+    label: Registration Directory Host Path
+    description: Host path to the registration's directory in the CSI node daemonset
+    type: string
+    default: /opt/rke/var/lib/kubelet/plugins_registry
+    group: Node
+
+  - variable: csiNode.podsMountDir
+    label: Pods Mount Directory Host Path
+    description: Host path to the pods mount directory in the CSI node daemonset
+    type: string
+    default: /opt/rke/var/lib/kubelet
+    group: Node
+
+  - variable: csiNode.pluginDir
+    label: Plugin Directory Host Path
+    description: Host path to the plugin's directory in the CSI node daemonset
+    type: string
+    default: /opt/rke/var/lib/kubelet/plugins/csi.vsphere.vmware.com
+    group: Node

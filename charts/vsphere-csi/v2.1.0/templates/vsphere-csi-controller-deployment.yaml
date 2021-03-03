@@ -17,8 +17,8 @@ spec:
     spec:
       serviceAccountName: vsphere-csi-controller
       nodeSelector:
-      {{- if .Values.nodeSelector}}
-      {{- with .Values.nodeSelector }}
+      {{- if .Values.csiController.nodeSelector }}
+      {{- with .Values.csiController.nodeSelector }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- else }}
@@ -32,7 +32,7 @@ spec:
       dnsPolicy: "Default"
       containers:
         - name: csi-attacher
-          image: quay.io/k8scsi/csi-attacher:v3.0.0
+          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.csiAttacher.image.repository }}:{{ .Values.csiController.csiAttacher.image.tag }}"
           args:
             - "--v=4"
             - "--timeout=300s"
@@ -44,9 +44,9 @@ spec:
           volumeMounts:
             - mountPath: /csi
               name: socket-dir
-{{- if .Values.csiResizer.enabled }}
+{{- if .Values.csiController.csiResizer.enabled }}
         - name: csi-resizer
-          image: quay.io/k8scsi/csi-resizer:v1.0.0
+          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.csiResizer.image.repository }}:{{ .Values.csiController.csiResizer.image.tag }}"
           args:
             - "--v=4"
             - "--timeout=300s"
@@ -60,11 +60,11 @@ spec:
               name: socket-dir
 {{- end }}
         - name: vsphere-csi-controller
-          image: gcr.io/cloud-provider-vsphere/csi/release/driver:v2.1.0
+          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.image.repository }}:{{ .Values.csiController.image.tag }}"
           args:
             - "--fss-name=internal-feature-states.csi.vsphere.vmware.com"
             - "--fss-namespace=$(CSI_NAMESPACE)"
-          imagePullPolicy: "Always"
+          imagePullPolicy: "{{ .Values.csiController.image.pullPolicy }}"
           env:
             - name: CSI_ENDPOINT
               value: unix:///csi/csi.sock
@@ -101,7 +101,7 @@ spec:
             periodSeconds: 5
             failureThreshold: 3
         - name: liveness-probe
-          image: quay.io/k8scsi/livenessprobe:v2.1.0
+          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.livelinessProbe.image.repository }}:{{ .Values.csiController.livelinessProbe.image.tag }}"
           args:
             - "--v=4"
             - "--csi-address=/csi/csi.sock"
@@ -109,12 +109,12 @@ spec:
             - name: socket-dir
               mountPath: /csi
         - name: vsphere-syncer
-          image: gcr.io/cloud-provider-vsphere/csi/release/syncer:v2.1.0
+          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.vsphereSyncer.image.repository }}:{{ .Values.csiController.vsphereSyncer.image.tag }}"
           args:
             - "--leader-election"
             - "--fss-name=internal-feature-states.csi.vsphere.vmware.com"
             - "--fss-namespace=$(CSI_NAMESPACE)"
-          imagePullPolicy: "Always"
+          imagePullPolicy: "{{ .Values.csiController.vsphereSyncer.image.pullPolicy }}"
           env:
             - name: FULL_SYNC_INTERVAL_MINUTES
               value: "30"
@@ -135,7 +135,7 @@ spec:
               name: vsphere-config-volume
               readOnly: true
         - name: csi-provisioner
-          image: quay.io/k8scsi/csi-provisioner:v2.0.0
+          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.csiProvisioner.image.repository }}:{{ .Values.csiController.csiProvisioner.image.tag }}"
           args:
             - "--v=4"
             - "--timeout=300s"
@@ -154,7 +154,7 @@ spec:
       volumes:
       - name: vsphere-config-volume
         secret:
-          secretName: {{ .Values.vCenter.configSecret.name }}
+          secretName: {{ .Values.csiController.vsphereConfig.secret.name }}
       - name: socket-dir
         emptyDir: {}
 ---
@@ -174,4 +174,3 @@ spec:
   attachRequired: true
   podInfoOnMount: false
 ---
-
