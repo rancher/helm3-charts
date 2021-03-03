@@ -1,29 +1,18 @@
-cloudConfig:
+vCenter:
   host: ""
-  insecureFlag: true
   port: 443
+  insecureFlag: true
   datacenters: ""
-  template: |
-    [Global]
-    secret-name = {{ .Values.secret.name | quote }}
-    secret-namespace = {{ .Release.Namespace | quote }}
-    port = {{ .Values.cloudConfig.port | quote }}
-    insecure-flag = {{ .Values.cloudConfig.insecureFlag | quote }}
-
-    [VirtualCenter {{ .Values.cloudConfig.host | quote }}]
-    datacenters = {{ .Values.cloudConfig.datacenters | quote }}
-
-secret:
-  generate: true
-  name: "vsphere-cpi-creds"
   username: ""
   password: ""
+  credentialsSecret:
+    name: "vsphere-cpi-creds"
+    generate: true
 
 cloudControllerManager:
   image:
-    repository: gcr.io/cloud-provider-vsphere/cpi/release/manager
+    repository: rancher/mirrored-cloud-provider-vsphere-cpi-release-manager
     tag: v1.2.1
-
   nodeSelector: {}
 
 global:
