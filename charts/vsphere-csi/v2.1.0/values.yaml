@@ -1,81 +1,63 @@
+vCenter:
+  host: ""
+  port: 443
+  insecureFlag: true
+  clusterId: ""
+  datacenters: ""
+  username: ""
+  password: ""
+  configSecret:
+    name: "vsphere-config-secret"
+    generate: true
+  configTemplate: |
+    [Global]
+    cluster-id = {{ required ".Values.vCenter.clusterId must be provided" (default .Values.vCenter.clusterId .Values.global.cattle.clusterId) | quote }}
+    user = {{ .Values.vCenter.username | quote }}
+    password = {{ .Values.vCenter.password | quote }}
+    port = {{ .Values.vCenter.port | quote }}
+    insecure-flag = {{ .Values.vCenter.insecureFlag | quote }}
+
+    [VirtualCenter {{ .Values.vCenter.host | quote }}]
+    datacenters = {{ .Values.vCenter.datacenters | quote }}
+
 csiController:
-  vsphereConfig:
-    host: ""
-    datacenters: ""
-    port: 443
-    insecureFlag: true
-    username: ""
-    password: ""
-    secret:
-      name: "vsphere-config-secret"
-      generate: true
-      configTemplate: |
-        [Global]
-        cluster-id = {{ uuidv4 | quote }}
-        user = {{ .Values.csiController.vsphereConfig.username | quote }}
-        password = {{ .Values.csiController.vsphereConfig.password | quote }}
-        port = {{ .Values.csiController.vsphereConfig.port | quote }}
-        insecure-flag = {{ .Values.csiController.vsphereConfig.insecureFlag | quote }}
-
-        [VirtualCenter {{ .Values.csiController.vsphereConfig.host | quote }}]
-        datacenters = {{ .Values.csiController.vsphereConfig.datacenters | quote }}
-
+  csiResizer:
+    enabled: false
   image:
     repository: gcr.io/cloud-provider-vsphere/csi/release/driver
     tag: v2.1.0
     pullPolicy: Always
-
-  csiAttacher:
-    image:
+    csiAttacher:
       repository: quay.io/k8scsi/csi-attacher
       tag: v3.0.0
-
-  csiResizer:
-    enabled: false
-    image:
+    csiResizer:
       repository: quay.io/k8scsi/csi-resizer
       tag: v1.0.0
-
-  livelinessProbe:
-    image:
+    livenessProbe:
       repository: quay.io/k8scsi/livenessprobe
       tag: v2.1.0
-
-  vsphereSyncer:
-    image:
+    vsphereSyncer:
       repository: gcr.io/cloud-provider-vsphere/csi/release/syncer
       tag: v2.1.0
       pullPolicy: Always
-
-  csiProvisioner:
-    image:
+    csiProvisioner:
       repository: quay.io/k8scsi/csi-provisioner
       tag: v2.0.0
-
   nodeSelector: {}
 
 csiMigration:
   enabled: false
 
 csiNode:
-  driverRegSockPath: /var/lib/kubelet/plugins/csi.vsphere.vmware.com/csi.sock
-  podsMountDir: /var/lib/kubelet
-  registrationDir: /var/lib/kubelet/plugins_registry
-  pluginDir: /var/lib/kubelet/plugins/csi.vsphere.vmware.com
-  podsMountDir: /var/lib/kubelet
-
+  prefixPath: ""
   image:
     repository: gcr.io/cloud-provider-vsphere/csi/release/driver
     tag: v2.1.0
     pullPolicy: Always
-
-  nodeDriverRegistrar:
-    image:
+    nodeDriverRegistrar:
       repository: quay.io/k8scsi/csi-node-driver-registrar
       tag: v2.0.1
-
-  livelinessProbe:
-    image:
+    livenessProbe:
       repository: quay.io/k8scsi/livenessprobe
       tag: v2.1.0
 

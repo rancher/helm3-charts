@@ -21,7 +21,7 @@ spec:
       dnsPolicy: "Default"
       containers:
       - name: node-driver-registrar
-        image: "{{ template "system_default_registry" . }}{{ .Values.csiNode.nodeDriverRegistrar.image.repository }}:{{ .Values.csiNode.nodeDriverRegistrar.image.tag }}"
+        image: "{{ template "system_default_registry" . }}{{ .Values.csiNode.image.nodeDriverRegistrar.repository }}:{{ .Values.csiNode.image.nodeDriverRegistrar.tag }}"
         args:
         - "--v=5"
         - "--csi-address=$(ADDRESS)"
@@ -31,7 +31,7 @@ spec:
         - name: ADDRESS
           value: /csi/csi.sock
         - name: DRIVER_REG_SOCK_PATH
-          value: {{ .Values.csiNode.driverRegSockPath }}
+          value: {{ .Values.csiNode.prefixPath }}/var/lib/kubelet/plugins/csi.vsphere.vmware.com/csi.sock
         securityContext:
           privileged: true
         volumeMounts:
@@ -89,7 +89,7 @@ spec:
         - name: plugin-dir
           mountPath: /csi
         - name: pods-mount-dir
-          mountPath: {{ .Values.csiNode.podsMountDir }}
+          mountPath: {{ .Values.csiNode.prefixPath }}/var/lib/kubelet
           # needed so that any mounts setup inside this container are
           # propagated back to the host machine.
           mountPropagation: "Bidirectional"
@@ -105,7 +105,7 @@ spec:
           initialDelaySeconds: 10
           timeoutSeconds: 5
       - name: liveness-probe
-        image: "{{ template "system_default_registry" . }}{{ .Values.csiNode.livelinessProbe.image.repository }}:{{ .Values.csiNode.livelinessProbe.image.tag }}"
+        image: "{{ template "system_default_registry" . }}{{ .Values.csiNode.image.livenessProbe.repository }}:{{ .Values.csiNode.image.livenessProbe.tag }}"
         args:
           - "--v=4"
           - "--csi-address=/csi/csi.sock"
@@ -119,15 +119,15 @@ spec:
       #    secretName: vsphere-config-secret
       - name: registration-dir
         hostPath:
-          path: {{ .Values.csiNode.registrationDir }}
+          path: {{ .Values.csiNode.prefixPath }}/var/lib/kubelet/plugins_registry
           type: Directory
       - name: plugin-dir
         hostPath:
-          path: {{ .Values.csiNode.pluginDir }}
+          path: {{ .Values.csiNode.prefixPath }}/var/lib/kubelet/plugins/csi.vsphere.vmware.com
           type: DirectoryOrCreate
       - name: pods-mount-dir
         hostPath:
-          path: {{ .Values.csiNode.podsMountDir }}
+          path: {{ .Values.csiNode.prefixPath }}/var/lib/kubelet
           type: Directory
       - name: device-dir
         hostPath:

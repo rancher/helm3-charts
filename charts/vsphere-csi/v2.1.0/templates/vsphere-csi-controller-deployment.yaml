@@ -32,7 +32,7 @@ spec:
       dnsPolicy: "Default"
       containers:
         - name: csi-attacher
-          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.csiAttacher.image.repository }}:{{ .Values.csiController.csiAttacher.image.tag }}"
+          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.image.csiAttacher.repository }}:{{ .Values.csiController.image.csiAttacher.tag }}"
           args:
             - "--v=4"
             - "--timeout=300s"
@@ -46,7 +46,7 @@ spec:
               name: socket-dir
 {{- if .Values.csiController.csiResizer.enabled }}
         - name: csi-resizer
-          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.csiResizer.image.repository }}:{{ .Values.csiController.csiResizer.image.tag }}"
+          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.image.csiResizer.repository }}:{{ .Values.image.csiController.csiResizer.tag }}"
           args:
             - "--v=4"
             - "--timeout=300s"
@@ -101,7 +101,7 @@ spec:
             periodSeconds: 5
             failureThreshold: 3
         - name: liveness-probe
-          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.livelinessProbe.image.repository }}:{{ .Values.csiController.livelinessProbe.image.tag }}"
+          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.image.livenessProbe.repository }}:{{ .Values.csiController.image.livenessProbe.tag }}"
           args:
             - "--v=4"
             - "--csi-address=/csi/csi.sock"
@@ -109,12 +109,12 @@ spec:
             - name: socket-dir
               mountPath: /csi
         - name: vsphere-syncer
-          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.vsphereSyncer.image.repository }}:{{ .Values.csiController.vsphereSyncer.image.tag }}"
+          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.image.vsphereSyncer.repository }}:{{ .Values.csiController.image.vsphereSyncer.tag }}"
           args:
             - "--leader-election"
             - "--fss-name=internal-feature-states.csi.vsphere.vmware.com"
             - "--fss-namespace=$(CSI_NAMESPACE)"
-          imagePullPolicy: "{{ .Values.csiController.vsphereSyncer.image.pullPolicy }}"
+          imagePullPolicy: "{{ .Values.csiController.image.vsphereSyncer.pullPolicy }}"
           env:
             - name: FULL_SYNC_INTERVAL_MINUTES
               value: "30"
@@ -135,7 +135,7 @@ spec:
               name: vsphere-config-volume
               readOnly: true
         - name: csi-provisioner
-          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.csiProvisioner.image.repository }}:{{ .Values.csiController.csiProvisioner.image.tag }}"
+          image: "{{ template "system_default_registry" . }}{{ .Values.csiController.image.csiProvisioner.repository }}:{{ .Values.csiController.image.csiProvisioner.tag }}"
           args:
             - "--v=4"
             - "--timeout=300s"
@@ -154,7 +154,7 @@ spec:
       volumes:
       - name: vsphere-config-volume
         secret:
-          secretName: {{ .Values.csiController.vsphereConfig.secret.name }}
+          secretName: {{ .Values.vCenter.configSecret.name }}
       - name: socket-dir
         emptyDir: {}
 ---
