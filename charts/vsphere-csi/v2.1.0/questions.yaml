@@ -90,4 +90,4 @@ questions:
     description: For some operating systems including RancherOS, RKE prefixes `/var/lib/kubelet` with `/opt/rke`.  Add the prefix path of the location of /var/lib/kubelet
     type: string
     default: ""
-    group: Node
+    group: Node Configuration
