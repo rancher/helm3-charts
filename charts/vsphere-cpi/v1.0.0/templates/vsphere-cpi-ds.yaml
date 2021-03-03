@@ -22,8 +22,8 @@ spec:
         k8s-app: vsphere-cloud-controller-manager
     spec:
       nodeSelector:
-      {{- if .Values.nodeSelector}}
-      {{- with .Values.nodeSelector }}
+      {{- if .Values.cloudControllerManager.nodeSelector}}
+      {{- with .Values.cloudControllerManager.nodeSelector }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- else }}
@@ -39,7 +39,7 @@ spec:
       serviceAccountName: cloud-controller-manager
       containers:
         - name: vsphere-cloud-controller-manager
-          image: gcr.io/cloud-provider-vsphere/cpi/release/manager:v1.2.1
+          image: "{{ template "system_default_registry" . }}{{ .Values.cloudControllerManager.image.repository }}:{{ .Values.cloudControllerManager.image.tag }}"
           args:
             - --v=2
             - --cloud-provider=vsphere

@@ -4,12 +4,4 @@ metadata:
   name: cloud-config
   namespace: {{ .Release.Namespace }}
 data:
-  vsphere.conf: |
-    [Global]
-    secret-name = {{ .Values.vCenter.credentialsSecretName | quote }}
-    secret-namespace = {{ .Release.Namespace | quote }}
-    port = {{ .Values.vCenter.port | default "443" | quote }}
-    insecure-flag = {{ .Values.vCenter.insecureflag | default "1" | quote }}
-
-    [VirtualCenter {{ .Values.vCenter.host | quote }}]
-    datacenters = {{ .Values.vCenter.datacenters | quote }}
+  vsphere.conf: {{ tpl .Values.cloudConfig.template . | quote }}
