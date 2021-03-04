@@ -48,7 +48,7 @@ questions:
     default: false
     group: Migration
 
-  - variable: csiResizer.enabled
+  - variable: csiController.csiResizer.enabled
     label: Enable CSI Volume Resizer
     description: This feature is available for vSphere 7.0 U1+ only
     type: boolean
@@ -84,3 +84,10 @@ questions:
         label: Data Store URL
         description: URL of the data store to use for new volumes (If unspecified, any data store that matches the request will be selected).
         type: string
+
+  - variable: csiNode.prefixPath
+    label: Prefix Path for `/var/lib/kubelet`
+    description: For some operating systems including RancherOS, RKE prefixes `/var/lib/kubelet` with `/opt/rke`.  Add the prefix path of the location of /var/lib/kubelet
+    type: string
+    default: ""
+    group: Node Configuration

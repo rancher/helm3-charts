@@ -21,7 +21,7 @@ spec:
       dnsPolicy: "Default"
       containers:
       - name: node-driver-registrar
-        image: quay.io/k8scsi/csi-node-driver-registrar:v2.0.1
+        image: "{{ template "system_default_registry" . }}{{ .Values.csiNode.image.nodeDriverRegistrar.repository }}:{{ .Values.csiNode.image.nodeDriverRegistrar.tag }}"
         args:
         - "--v=5"
         - "--csi-address=$(ADDRESS)"
@@ -31,7 +31,7 @@ spec:
         - name: ADDRESS
           value: /csi/csi.sock
         - name: DRIVER_REG_SOCK_PATH
-          value: /var/lib/kubelet/plugins/csi.vsphere.vmware.com/csi.sock
+          value: {{ .Values.csiNode.prefixPath }}/var/lib/kubelet/plugins/csi.vsphere.vmware.com/csi.sock
         securityContext:
           privileged: true
         volumeMounts:
@@ -49,7 +49,7 @@ spec:
           initialDelaySeconds: 5
           timeoutSeconds: 5
       - name: vsphere-csi-node
-        image: gcr.io/cloud-provider-vsphere/csi/release/driver:v2.1.0
+        image: "{{ template "system_default_registry" . }}{{ .Values.csiNode.image.repository }}:{{ .Values.csiNode.image.tag }}"
         args:
           - "--fss-name=internal-feature-states.csi.vsphere.vmware.com"
           - "--fss-namespace=$(CSI_NAMESPACE)"
@@ -89,7 +89,7 @@ spec:
         - name: plugin-dir
           mountPath: /csi
         - name: pods-mount-dir
-          mountPath: /var/lib/kubelet
+          mountPath: {{ .Values.csiNode.prefixPath }}/var/lib/kubelet
           # needed so that any mounts setup inside this container are
           # propagated back to the host machine.
           mountPropagation: "Bidirectional"
@@ -105,7 +105,7 @@ spec:
           initialDelaySeconds: 10
           timeoutSeconds: 5
       - name: liveness-probe
-        image: quay.io/k8scsi/livenessprobe:v2.1.0
+        image: "{{ template "system_default_registry" . }}{{ .Values.csiNode.image.livenessProbe.repository }}:{{ .Values.csiNode.image.livenessProbe.tag }}"
         args:
           - "--v=4"
           - "--csi-address=/csi/csi.sock"
@@ -119,15 +119,15 @@ spec:
       #    secretName: vsphere-config-secret
       - name: registration-dir
         hostPath:
-          path: /var/lib/kubelet/plugins_registry
+          path: {{ .Values.csiNode.prefixPath }}/var/lib/kubelet/plugins_registry
           type: Directory
       - name: plugin-dir
         hostPath:
-          path: /var/lib/kubelet/plugins/csi.vsphere.vmware.com
+          path: {{ .Values.csiNode.prefixPath }}/var/lib/kubelet/plugins/csi.vsphere.vmware.com
           type: DirectoryOrCreate
       - name: pods-mount-dir
         hostPath:
-          path: /var/lib/kubelet
+          path: {{ .Values.csiNode.prefixPath }}/var/lib/kubelet
           type: Directory
       - name: device-dir
         hostPath:
