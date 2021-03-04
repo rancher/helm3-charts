@@ -6,10 +6,10 @@ metadata:
 data:
   vsphere.conf: |
     [Global]
-    secret-name = {{ .Values.vCenter.credentialsSecretName | quote }}
+    secret-name = {{ .Values.vCenter.credentialsSecret.name | quote }}
     secret-namespace = {{ .Release.Namespace | quote }}
-    port = {{ .Values.vCenter.port | default "443" | quote }}
-    insecure-flag = {{ .Values.vCenter.insecureflag | default "1" | quote }}
+    port = {{ .Values.vCenter.port | quote }}
+    insecure-flag = {{ .Values.vCenter.insecureFlag | quote }}
 
     [VirtualCenter {{ .Values.vCenter.host | quote }}]
     datacenters = {{ .Values.vCenter.datacenters | quote }}

@@ -15,7 +15,7 @@ questions:
     required: true
     group: Configuration
 
-  - variable: vCenter.generateCredentialsSecret
+  - variable: vCenter.credentialsSecret.generate
     label: Generate Credential's Secret
     description: Generates a secret with the vSphere credentials (If the option to generate it is enabled, credentials will be visible in the API to authorized users)
     type: boolean
@@ -35,10 +35,10 @@ questions:
         type: password
         group: Configuration
 
-  - variable: vCenter.credentialsSecretName
+  - variable: vCenter.credentialsSecret.name
     label: Credential's Secret Name
     description: Name of the secret with the vSphere credentials (Will not be visible in the API. More info in the README)
     default: "vsphere-cpi-creds"
     type: string
     group: Configuration
-    show_if: "vCenter.generateCredentialsSecret=false"
+    show_if: "vCenter.credentialsSecret.generate=false"
