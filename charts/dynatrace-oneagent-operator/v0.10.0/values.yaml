@@ -56,7 +56,7 @@ oneagent:
   proxy: ""
   trustedCAs: ""
   networkZone: ""
-  useUnprivilegedMode: false
+  useUnprivilegedMode: true
   useImmutableImage: false
   agentVersion: ""
   customPullSecret: ""
