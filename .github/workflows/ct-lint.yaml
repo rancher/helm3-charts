@@ -1,0 +1,95 @@
+name: Lint and Test Charts
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    env:
+      remote_url: https://github.com/rancher/helm3-charts.git
+      # Chart-testing parameters
+      ct_remote: rancher-helm3-charts
+      ct_target_branch: master
+      ct_debug: false
+      ct_print_config: true
+      ct_validate_maintainers: false
+      ct_check_version_increment: false
+      ct_namespace: default
+      ct_chart_dirs: $(find charts -type d -mindepth 1 -maxdepth 1 | paste -sd ',')
+      ct_chart_repos: "\
+        stable=https://charts.helm.sh/stable,\
+        incubator=https://charts.helm.sh/incubator"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          # chart-testing requires a full clone
+          fetch-depth: 0
+
+      - name: Set up Rancher remote
+        run: >
+          git remote add ${{ env.ct_remote }} ${{ env.remote_url }}
+          --fetch
+          --track ${{ env.ct_target_branch }}
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.4.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.0.1
+
+      - name: Run chart-testing [ct list-changed]
+        id: list-changed
+        run: >
+          changed=$(
+          ct list-changed
+          --remote ${{ env.ct_remote }}
+          --target-branch ${{ env.ct_target_branch }}
+          --chart-dirs ${{ env.ct_chart_dirs }}
+          )
+
+          if [[ -n "$changed" ]]; then
+            echo "::set-output name=changed::true"
+          else
+            echo "No chart changes detected, skipping tests."
+          fi
+
+      - name: Run chart-testing [ct lint]
+        if: steps.list-changed.outputs.changed == 'true'
+        run: >
+          ct lint
+          --remote ${{ env.ct_remote }}
+          --target-branch ${{ env.ct_target_branch }}
+          --debug=${{ env.ct_debug }}
+          --print-config=${{ env.ct_print_config }}
+          --validate-maintainers=${{ env.ct_validate_maintainers }}
+          --check-version-increment=${{ env.ct_check_version_increment }}
+          --chart-repos ${{ env.ct_chart_repos }}
+          --chart-dirs ${{ env.ct_chart_dirs }}
+
+      # These steps create a Kind cluster and runs ct install in it. Since some charts require specific user provided
+      # configurations before installation, errors will be logged and the workflow will continue without failures
+      - name: Create kind cluster
+        if: steps.list-changed.outputs.changed == 'true'
+        uses: helm/kind-action@v1.0.0
+      - name: Run chart-testing [ct install]
+        if: steps.list-changed.outputs.changed == 'true'
+        continue-on-error: true
+        run: >
+          ct install
+          --namespace ${{ env.ct_namespace }}
+          --remote ${{ env.ct_remote }}
+          --target-branch ${{ env.ct_target_branch }}
+          --print-config=${{ env.ct_print_config }}
+          --debug=${{ env.ct_debug }}
+          --chart-repos ${{ env.ct_chart_repos }}
+          --chart-dirs ${{ env.ct_chart_dirs }}
