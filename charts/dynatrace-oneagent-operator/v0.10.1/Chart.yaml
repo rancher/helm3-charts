@@ -18,8 +18,8 @@ description: The Dynatrace OneAgent Operator Helm chart for Kubernetes and Opens
 icon: file://../logo.png
 home: https://www.dynatrace.com/
 type: application
-version: 0.10.0
-appVersion: 0.10.0
+version: 0.10.1
+appVersion: 0.10.1
 maintainers:
   - name: DTMad
     email: marco.mader@dynatrace.com
