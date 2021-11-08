@@ -17,3 +17,5 @@ name: hpe-csi-driver
 sources:
 - https://scod.hpedev.io/csi_driver
 version: 1.4.2
+annotations:
+  catalog.cattle.io/rancher-version: "< 2.6.3"
