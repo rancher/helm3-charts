@@ -16,3 +16,5 @@ sources:
 maintainers:
 - email: gadi@alcide.io
   name: gadinaor
+annotations:
+  catalog.cattle.io/rancher-version: "< 2.6.3"

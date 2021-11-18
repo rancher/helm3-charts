@@ -1,6 +1,9 @@
+rancher_max_version: 2.6.2
 categories:
 - APM
 - Monitoring
+labels:
+  io.rancher.certified: partner
 questions:
 
 #################### Agent Configuration ####################

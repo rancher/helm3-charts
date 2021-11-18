@@ -13,3 +13,5 @@ keywords:
 maintainers:
   - name: catalogic
     email: info@catalogicsoftware.com
+annotations:
+  catalog.cattle.io/rancher-version: "< 2.6.3"

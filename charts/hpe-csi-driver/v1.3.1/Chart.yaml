@@ -17,3 +17,5 @@ keywords:
   - CentOS
   - Ubuntu
   - RHEL
+annotations:
+  catalog.cattle.io/rancher-version: "< 2.6.3"

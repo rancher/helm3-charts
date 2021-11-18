@@ -1,3 +1,4 @@
+rancher_max_version: 2.6.2
 namespace: cloudcasa-io
 labels:
   io.rancher.certified: partner

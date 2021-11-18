@@ -11,3 +11,5 @@ maintainers:
   name: rainest
 name: kong
 version: 1.9.1
+annotations:
+  catalog.cattle.io/rancher-version: "< 2.6.3"

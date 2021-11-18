@@ -29,3 +29,5 @@ maintainers:
     email: michael.mayr@dynatrace.com
 sources:
   - https://github.com/Dynatrace/helm-charts
+annotations:
+  catalog.cattle.io/rancher-version: "< 2.6.3"
