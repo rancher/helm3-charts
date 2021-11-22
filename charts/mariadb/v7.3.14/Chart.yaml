@@ -18,3 +18,5 @@ maintainers:
   - name: Bitnami
     email: containers@bitnami.com
 engine: gotpl
+annotations:
+  catalog.cattle.io/rancher-version: "< 2.6.3"
