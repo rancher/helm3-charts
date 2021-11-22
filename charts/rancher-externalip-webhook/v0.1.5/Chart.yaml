@@ -4,6 +4,7 @@ annotations:
   catalog.cattle.io/namespace: cattle-externalip-system
   catalog.cattle.io/release-name: rancher-externalip-webhook
   catalog.cattle.io/ui-component: rancher-externalip-webhook
+  catalog.cattle.io/rancher-version: "< 2.6.3"
 apiVersion: v1
 appVersion: v0.1.5
 description: |
